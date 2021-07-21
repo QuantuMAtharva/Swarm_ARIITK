@@ -10,7 +10,13 @@ Obstacle Avoidance using Swarm Robotics
 ``sudo apt-get install ros-melodic-desktop-full ros-melodic-joy ros-melodic-octomap-ros ros-melodic-mavlink python-wstool python-catkin-tools protobuf-compiler libgoogle-glog-dev ros-melodic-control-toolbox ros-melodic-mavros ros-melodic-geographic-*``
 <br>
 <br>
-``sudo apt-get install python-pip pip install --upgrade pip pip install future``
+``sudo apt-get install python-pip``
+<br>
+<br>
+``pip install --upgrade pip``
+<br>
+<br>
+``pip install future``
 <br>
 <br>
 ``sudo apt-get install python-future``
