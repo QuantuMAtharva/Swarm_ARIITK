@@ -3,16 +3,21 @@ project(four_drones)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
+add_definitions(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+find_package(gazebo REQUIRED)
+find_package(PythonInterp REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rospy
 )
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
+find_package(catkin REQUIRED COMPONENTS gazebo_msgs geometry_msgs mav_msgs roscpp sensor_msgs)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -103,7 +108,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES four_drones
-#  CATKIN_DEPENDS roscpp
+ CATKIN_DEPENDS roscpp rospy geometry_msgs mav_msgs sensor_msgs gazebo_msgs
 #  DEPENDS system_lib
 )
 
@@ -202,3 +207,29 @@ include_directories(
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+
+# Adding below from rotors_ws but later commented as using directly from rotors_ws instead of copying files
+
+# add_executable(waypoint_publisher src/waypoint_publisher.cpp)
+# target_link_libraries(waypoint_publisher ${catkin_LIBRARIES})
+# add_dependencies(waypoint_publisher ${catkin_EXPORTED_TARGETS})
+
+# add_executable(waypoint_publisher_file src/waypoint_publisher_file.cpp)
+# target_link_libraries(waypoint_publisher_file ${catkin_LIBRARIES})
+# add_dependencies(waypoint_publisher_file ${catkin_EXPORTED_TARGETS})
+
+# add_executable(hovering_example src/hovering_example.cpp)
+# target_link_libraries(hovering_example ${catkin_LIBRARIES})
+# add_dependencies(hovering_example ${catkin_EXPORTED_TARGETS})
+
+# foreach(dir launch models resource worlds)
+#    install(DIRECTORY ${dir}/
+#       DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/${dir})
+# endforeach(dir)
+
+# install(TARGETS waypoint_publisher waypoint_publisher_file hovering_example
+#   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+#   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+# )
