@@ -17,7 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-find_package(catkin REQUIRED COMPONENTS gazebo_msgs geometry_msgs mav_msgs roscpp sensor_msgs)
+find_package(catkin REQUIRED COMPONENTS gazebo_msgs geometry_msgs mav_msgs roscpp sensor_msgs std_msgs std_srvs)
 
 
 ## Uncomment this if the package has a setup.py. This macro ensures
@@ -136,22 +136,27 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/four_drones_node.cpp)
+add_executable(drone1 src/drone1.cpp)
+target_link_libraries(drone1
+  ${catkin_LIBRARIES}
+)
 
-## Rename C++ executable without prefix
-## The above recommended prefix causes long target names, the following renames the
-## target back to the shorter version for ease of user use
-## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
-# set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
+add_executable(drone2 src/drone2.cpp)
+target_link_libraries(drone2
+  ${catkin_LIBRARIES}
+)
 
-## Add cmake target dependencies of the executable
-## same as for the library above
-# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_executable(drone3 src/drone3.cpp)
+target_link_libraries(drone3
+  ${catkin_LIBRARIES}
+)
 
-## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+add_executable(drone4 src/drone4.cpp)
+target_link_libraries(drone4
+  ${catkin_LIBRARIES}
+)
+
+
 
 #############
 ## Install ##

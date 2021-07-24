@@ -65,6 +65,8 @@
   <depend>rotors_gazebo_plugins</depend>
   <depend>sensor_msgs</depend>
   <depend>xacro</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

@@ -40,6 +40,8 @@
     <node name="waypoint_publisher" pkg="rotors_gazebo" type="waypoint_publisher" output="screen" args="1 1 1 0 2"/>
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+    <rosparam file="$(find four_drones)/config/params.yaml"/>
+    <node name="drone1" pkg="four_drones" type="drone1" output="screen"/>
   </group>
 
   <group ns="$(arg mav_name)2">
@@ -61,6 +63,8 @@
     <node name="waypoint_publisher" pkg="rotors_gazebo" type="waypoint_publisher" output="screen" args="-1 -1 1 0 2"/>
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+    <rosparam file="$(find four_drones)/config/params.yaml"/>
+    <node name="drone2" pkg="four_drones" type="drone2" output="screen"/>
   </group>
 
   <group ns="$(arg mav_name)3">
@@ -82,6 +86,8 @@
     <node name="waypoint_publisher" pkg="rotors_gazebo" type="waypoint_publisher" output="screen" args="-1 1 1 0 2"/>
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+    <rosparam file="$(find four_drones)/config/params.yaml"/>
+    <node name="drone3" pkg="four_drones" type="drone3" output="screen"/>
   </group>
 
   <group ns="$(arg mav_name)4">
@@ -103,6 +109,8 @@
     <node name="waypoint_publisher" pkg="rotors_gazebo" type="waypoint_publisher" output="screen" args="1 -1 1 0 2"/>
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
+    <rosparam file="$(find four_drones)/config/params.yaml"/>
+    <node name="drone4" pkg="four_drones" type="drone4" output="screen"/>
   </group>
 
 </launch>
