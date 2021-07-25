@@ -114,13 +114,19 @@ int main(int argc, char** argv) {
   trajectory_msg.header.stamp = ros::Time::now();
 
   // Default desired position and yaw.
-  float x_coord,y_coord,z_coord,yaw_des;
+  float x_coord,y_coord,z_coord,yaw_des,exp_r,radius,min_dist,arm_length,rate;
   nh.getParam("x_coord",x_coord);
   nh.getParam("y_coord",y_coord);
   nh.getParam("z_coord",z_coord);
   nh.getParam("yaw_des",yaw_des);
+  nh.getParam("radius",radius);
+  nh.getParam("exp_r", exp_r);
+  nh.getParam("rate", rate);
+  nh.getParam("min_dist", min_dist);
+  nh.getParam("arm_length", arm_length);
 
-  Eigen::Vector3d desired_position(x_coord, y_coord, z_coord);
+
+  Eigen::Vector3d desired_position(x_coord-radius, y_coord+radius, z_coord+radius);
   double desired_yaw = yaw_des;
 
   // Overwrite defaults if set as node parameters.
@@ -140,7 +146,7 @@ int main(int argc, char** argv) {
   trajectory_pub.publish(trajectory_msg);
   ros::spinOnce();
 
-  ros::Rate looprate(20.0);
+  ros::Rate looprate(rate);
 
 
   
@@ -162,19 +168,19 @@ int main(int argc, char** argv) {
     ROS_INFO("velocity of firefly 3 = %f %f %f",x_vel,y_vel,z_vel);
 
 
-    float min_dist=0.9;
+    
     // command drone to stop at its location in case relative distance is less than threshold
-    if (r31<min_dist || r32<min_dist || r34<min_dist)
+    if (r31+arm_length<min_dist || r32+arm_length<min_dist || r34+arm_length<min_dist)
     {
       // nearest drone position
-      if (r31 <= r32 && r31 <= r34)
+      if (r31 +arm_length<= r32 && r31 +arm_length<= r34)
       {
         ROS_INFO("r31 is the smallest");
         x_near=x_pos1;
         y_near=y_pos1;
         z_near=z_pos1;
       }    
-      else if (r32 <= r31 && r32 <= r34)
+      else if (r32 +arm_length<= r31 && r32 +arm_length<= r34)
       {
         ROS_INFO("r32 is the smallest");
         x_near=x_pos2;
@@ -193,9 +199,9 @@ int main(int argc, char** argv) {
       del_ry=y_pos3-y_near;
       del_rz=z_pos3-z_near;
       mod_r=pow((pow(del_rx,2)+pow(del_ry,2)+pow(del_rz,2)),0.5);
-      x_vel = x_vel + (del_rx/pow(mod_r,2));
-      y_vel = y_vel + (del_ry/pow(mod_r,2));
-      z_vel = z_vel + (del_rz/pow(mod_r,2));
+      x_vel = x_vel - (del_rx/pow(mod_r,exp_r));
+      y_vel = y_vel - (del_ry/pow(mod_r,exp_r));
+      z_vel = z_vel - (del_rz/pow(mod_r,exp_r));
       
       // publish new velocity to avoid collision
       // method 1- 

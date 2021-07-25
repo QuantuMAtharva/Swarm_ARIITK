@@ -113,14 +113,20 @@ int main(int argc, char** argv) {
   trajectory_msgs::MultiDOFJointTrajectory trajectory_msg;
   trajectory_msg.header.stamp = ros::Time::now();
 
+
   // Default desired position and yaw.
-  float x_coord,y_coord,z_coord,yaw_des;
+  float x_coord,y_coord,z_coord,yaw_des,exp_r,radius,min_dist,arm_length,rate;
   nh.getParam("x_coord",x_coord);
   nh.getParam("y_coord",y_coord);
   nh.getParam("z_coord",z_coord);
   nh.getParam("yaw_des",yaw_des);
+  nh.getParam("radius",radius);
+  nh.getParam("exp_r", exp_r);
+  nh.getParam("rate", rate);
+  nh.getParam("min_dist", min_dist);
+  nh.getParam("arm_length", arm_length);
 
-  Eigen::Vector3d desired_position(x_coord, y_coord, z_coord);
+  Eigen::Vector3d desired_position(x_coord+radius, y_coord+radius, z_coord+radius);
   double desired_yaw = yaw_des;
 
   // Overwrite defaults if set as node parameters.
@@ -140,7 +146,7 @@ int main(int argc, char** argv) {
   trajectory_pub.publish(trajectory_msg);
   ros::spinOnce();
 
-  ros::Rate looprate(20.0);
+  ros::Rate looprate(rate);
 
 
   
@@ -164,18 +170,17 @@ int main(int argc, char** argv) {
 
 
     //command drone to stop at its location in case relative distance is less than threshold
-    float min_dist=0.9;
-    if (r12<min_dist||r13<min_dist||r14<min_dist)
+    if (r12+arm_length<min_dist||r13+arm_length<min_dist||r14+arm_length<min_dist)
     {
       // nearest drone position
-      if (r12 <= r13 && r12 <= r14)
+      if (r12 + arm_length  <= r13 && r12 + arm_length <= r14)
       {
         ROS_INFO("r12 is the smallest");
         x_near=x_pos2;
         y_near=y_pos2;
         z_near=z_pos2;
       }    
-      else if (r13 <= r12 && r13 <= r14)
+      else if (r13 +arm_length<= r12 && r13+arm_length <= r14)
       {
         ROS_INFO("r13 is the smallest");
         x_near=x_pos3;
@@ -197,9 +202,9 @@ int main(int argc, char** argv) {
       del_ry=y_pos1-y_near;
       del_rz=z_pos1-z_near;
       mod_r=pow((pow(del_rx,2)+pow(del_ry,2)+pow(del_rz,2)),0.5);
-      x_vel = x_vel + (del_rx/pow(mod_r,2));
-      y_vel = y_vel + (del_ry/pow(mod_r,2));
-      z_vel = z_vel + (del_rz/pow(mod_r,2));
+      x_vel = x_vel - (del_rx/pow(mod_r,exp_r));
+      y_vel = y_vel - (del_ry/pow(mod_r,exp_r));
+      z_vel = z_vel - (del_rz/pow(mod_r,exp_r));
       
 
 
