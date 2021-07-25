@@ -1,6 +1,7 @@
 #include <thread>
 #include <chrono>
 #include <geometry_msgs/PointStamped.h>
+#include <nav_msgs/Odometry.h>
 #include <Eigen/Core>
 #include <mav_msgs/conversions.h>
 #include <mav_msgs/default_topics.h>
@@ -10,9 +11,11 @@
 #include <cmath>
 
 geometry_msgs::PointStamped data1,data2,data3,data4;
+nav_msgs::Odometry data5;
 
 
 float x_pos1,y_pos1,z_pos1,x_pos2,y_pos2,z_pos2,x_pos3,y_pos3,z_pos3,x_pos4,y_pos4,z_pos4;
+float x_vel,y_vel,z_vel;
 void subcallback1(const geometry_msgs::PointStamped::ConstPtr &msg)
 {
   data1=*msg;
@@ -49,6 +52,15 @@ void subcallback4(const geometry_msgs::PointStamped::ConstPtr &msg)
   ROS_INFO("position of firefly 4 ( from  function)= %f %f %f",x_pos4,y_pos4,z_pos4);
   return;
 }
+void sub_odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
+{
+  data5=*msg;
+  x_vel=data5.twist.twist.linear.x;
+  y_vel=data5.twist.twist.linear.y;
+  z_vel=data5.twist.twist.linear.z;
+  ROS_INFO("velocity of firefly 1 (from  function)= %f %f %f",x_vel,y_vel,z_vel);
+  return;
+}
 
 
 int main(int argc, char** argv) {
@@ -56,6 +68,7 @@ int main(int argc, char** argv) {
   ros::NodeHandle nh;
   // Create a private node handle for accessing node parameters.
   ros::NodeHandle nh_private("~");
+
   ros::Publisher trajectory_pub =
       nh.advertise<trajectory_msgs::MultiDOFJointTrajectory>(
           mav_msgs::default_topics::COMMAND_TRAJECTORY, 10);
@@ -68,7 +81,9 @@ int main(int argc, char** argv) {
             ("/firefly3/ground_truth/position",100,subcallback3);
   ros::Subscriber pos_sub4 = nh.subscribe<geometry_msgs::PointStamped>
             ("/firefly4/ground_truth/position",100,subcallback4);
-        
+  
+  ros::Subscriber pos_sub5 = nh.subscribe<nav_msgs::Odometry>
+            ("/firefly1/odometry_sensor1/odometry",100,sub_odom_callback);
 
 
 
@@ -125,15 +140,29 @@ int main(int argc, char** argv) {
   ros::spinOnce();
 
   ros::Rate looprate(20.0);
+
+
+  
   float r12,r13,r14;
+  float x_near,y_near,z_near;
+  float del_rx,del_ry,del_rz, mod_r;
+  
   while(ros::ok())
   {
     ros::spinOnce();
+
+
+    // calculate realtive distance of drones
     r12= pow((pow((x_pos1-x_pos2),2)+pow((y_pos1-y_pos2),2)+pow((z_pos1-z_pos2),2)),0.5);
     r13= pow((pow((x_pos1-x_pos3),2)+pow((y_pos1-y_pos3),2)+pow((z_pos1-z_pos3),2)),0.5);
     r14= pow((pow((x_pos1-x_pos4),2)+pow((y_pos1-y_pos4),2)+pow((z_pos1-z_pos4),2)),0.5);
     ROS_INFO("R12 = %f, %f, %f",r12, r13, r14);
-    if (r12<1.7)
+    ROS_INFO("velocity of firefly 1 = %f %f %f",x_vel,y_vel,z_vel);
+
+
+
+    // command drone to stop at its location in case relative distance is less than threshold
+    if (r12<0.7)
     {
       Eigen::Vector3d desired_position1(x_pos1, y_pos1, z_pos1);
       double desired_yaw1 = 0;
@@ -141,9 +170,53 @@ int main(int argc, char** argv) {
       desired_position1, desired_yaw1, &trajectory_msg);
       trajectory_pub.publish(trajectory_msg);
     }
+
+
+
+    // nearest drone position
+    if (r12 <= r13 && r12 <= r14)
+    {
+      ROS_INFO("r12 is the smallest");
+      x_near=x_pos2;
+      y_near=y_pos2;
+      z_near=z_pos2;
+    }    
+    else if (r13 <= r12 && r13 <= r14)
+    {
+      ROS_INFO("r13 is the smallest");
+      x_near=x_pos3;
+      y_near=y_pos3;
+      z_near=z_pos3;
+    }
+    else
+    {
+      ROS_INFO("r14 is the smallest");
+      x_near=x_pos4;
+      y_near=y_pos4;
+      z_near=z_pos4;
+    }
+
+
+
+    // calculate new velocity to avoid collision
+    del_rx=x_pos1-x_near;
+    del_ry=y_pos1-y_near;
+    del_rz=z_pos1-z_near;
+    mod_r=pow((pow(del_rx,2)+pow(del_ry,2)+pow(del_rz,2)),0.5);
+    x_vel = x_vel + (del_rx/pow(mod_r,3));
+    y_vel = y_vel + (del_ry/pow(mod_r,3));
+    z_vel = z_vel + (del_rz/pow(mod_r,3));
+    
+
+
+    // publish new velocity to avoid collision
+    
+
+
+
+
     ROS_INFO("position of firefly 1= %f %f %f",x_pos1,y_pos1,z_pos1);
     looprate.sleep();
-
   }
 
 
@@ -153,4 +226,3 @@ int main(int argc, char** argv) {
 }
 
 
-// 
