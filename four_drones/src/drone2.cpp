@@ -164,59 +164,56 @@ int main(int argc, char** argv) {
 
 
     // command drone to stop at its location in case relative distance is less than threshold
-    // if (r12<0.7)
-    // {
-    //   Eigen::Vector3d desired_position1(x_pos1, y_pos1, z_pos1);
-    //   double desired_yaw1 = 0;
-    //   mav_msgs::msgMultiDofJointTrajectoryFromPositionYaw(
-    //   desired_position1, desired_yaw1, &trajectory_msg);
-    //   trajectory_pub.publish(trajectory_msg);
-    // }
-
-
-
-    // nearest drone position
-    if (r21 <= r23 && r21 <= r24)
+    float min_dist=0.9;
+    if (r21<min_dist||r23<min_dist||r24<min_dist)
     {
-      ROS_INFO("r21 is the smallest");
-      x_near=x_pos1;
-      y_near=y_pos1;
-      z_near=z_pos1;
-    }    
-    else if (r23 <= r21 && r23 <= r24)
-    {
-      ROS_INFO("r23 is the smallest");
-      x_near=x_pos3;
-      y_near=y_pos3;
-      z_near=z_pos3;
+        // nearest drone position
+      if (r21 <= r23 && r21 <= r24)
+      {
+        ROS_INFO("r21 is the smallest");
+        x_near=x_pos1;
+        y_near=y_pos1;
+        z_near=z_pos1;
+      }    
+      else if (r23 <= r21 && r23 <= r24)
+      {
+        ROS_INFO("r23 is the smallest");
+        x_near=x_pos3;
+        y_near=y_pos3;
+        z_near=z_pos3;
+      }
+      else
+      {
+        ROS_INFO("r24 is the smallest");
+        x_near=x_pos4;
+        y_near=y_pos4;
+        z_near=z_pos4;
+      }
+
+
+
+      // calculate new velocity to avoid collision
+      del_rx=x_pos2-x_near;
+      del_ry=y_pos2-y_near;
+      del_rz=z_pos2-z_near;
+      mod_r=pow((pow(del_rx,2)+pow(del_ry,2)+pow(del_rz,2)),0.5);
+      x_vel = x_vel + (del_rx/pow(mod_r,2));
+      y_vel = y_vel + (del_ry/pow(mod_r,2));
+      z_vel = z_vel + (del_rz/pow(mod_r,2));
+      
+
+
+      // publish new velocity to avoid collision
+      // method 1- 
+      vel_pub.twist.twist.linear.x=x_vel;
+      vel_pub.twist.twist.linear.y=y_vel;
+      vel_pub.twist.twist.linear.z=z_vel;
+      cmd_vel_pub.publish(vel_pub);
     }
-    else
-    {
-      ROS_INFO("r24 is the smallest");
-      x_near=x_pos4;
-      y_near=y_pos4;
-      z_near=z_pos4;
-    }
 
 
 
-    // calculate new velocity to avoid collision
-    del_rx=x_pos2-x_near;
-    del_ry=y_pos2-y_near;
-    del_rz=z_pos2-z_near;
-    mod_r=pow((pow(del_rx,2)+pow(del_ry,2)+pow(del_rz,2)),0.5);
-    x_vel = x_vel + (del_rx/pow(mod_r,2));
-    y_vel = y_vel + (del_ry/pow(mod_r,2));
-    z_vel = z_vel + (del_rz/pow(mod_r,2));
     
-
-
-    // publish new velocity to avoid collision
-    // method 1- 
-    vel_pub.twist.twist.linear.x=x_vel;
-    vel_pub.twist.twist.linear.y=y_vel;
-    vel_pub.twist.twist.linear.z=z_vel;
-    cmd_vel_pub.publish(vel_pub);
 
 
 
