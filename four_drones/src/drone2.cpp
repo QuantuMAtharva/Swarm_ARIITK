@@ -58,13 +58,13 @@ void sub_odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
   x_vel=data5.twist.twist.linear.x;
   y_vel=data5.twist.twist.linear.y;
   z_vel=data5.twist.twist.linear.z;
-  ROS_INFO("velocity of firefly 1 (from  function)= %f %f %f",x_vel,y_vel,z_vel);
+  ROS_INFO("velocity of firefly 2 (from  function)= %f %f %f",x_vel,y_vel,z_vel);
   return;
 }
 
 
 int main(int argc, char** argv) {
-  ros::init(argc, argv, "drone1");
+  ros::init(argc, argv, "drone2");
   ros::NodeHandle nh;
   // Create a private node handle for accessing node parameters.
   ros::NodeHandle nh_private("~");
@@ -83,9 +83,9 @@ int main(int argc, char** argv) {
             ("/firefly4/ground_truth/position",100,subcallback4);
   
   ros::Subscriber pos_sub5 = nh.subscribe<nav_msgs::Odometry>
-            ("/firefly1/odometry_sensor1/odometry",100,sub_odom_callback);
+            ("/firefly2/odometry_sensor1/odometry",100,sub_odom_callback);
   ros::Publisher cmd_vel_pub =nh.advertise<nav_msgs::Odometry>
-            ("/firefly1/odometry_sensor1/odometry",100);
+            ("/firefly2/odometry_sensor1/odometry",100);
 
 
   // ROS_INFO("Started hovering");
@@ -144,7 +144,7 @@ int main(int argc, char** argv) {
 
 
   
-  float r12,r13,r14;
+  float r21,r23,r24;
   float x_near,y_near,z_near;
   float del_rx,del_ry,del_rz, mod_r;
   nav_msgs::Odometry vel_pub;
@@ -155,11 +155,11 @@ int main(int argc, char** argv) {
 
 
     // calculate realtive distance of drones
-    r12= pow((pow((x_pos1-x_pos2),2)+pow((y_pos1-y_pos2),2)+pow((z_pos1-z_pos2),2)),0.5);
-    r13= pow((pow((x_pos1-x_pos3),2)+pow((y_pos1-y_pos3),2)+pow((z_pos1-z_pos3),2)),0.5);
-    r14= pow((pow((x_pos1-x_pos4),2)+pow((y_pos1-y_pos4),2)+pow((z_pos1-z_pos4),2)),0.5);
-    ROS_INFO("R12 = %f, %f, %f",r12, r13, r14);
-    ROS_INFO("velocity of firefly 1 = %f %f %f",x_vel,y_vel,z_vel);
+    r21= pow((pow((x_pos1-x_pos2),2)+pow((y_pos1-y_pos2),2)+pow((z_pos1-z_pos2),2)),0.5);
+    r23= pow((pow((x_pos2-x_pos3),2)+pow((y_pos2-y_pos3),2)+pow((z_pos2-z_pos3),2)),0.5);
+    r24= pow((pow((x_pos2-x_pos4),2)+pow((y_pos2-y_pos4),2)+pow((z_pos2-z_pos4),2)),0.5);
+    ROS_INFO("R21 = %f, %f, %f",r21, r23, r24);
+    ROS_INFO("velocity of firefly 2 = %f %f %f",x_vel,y_vel,z_vel);
 
 
 
@@ -176,23 +176,23 @@ int main(int argc, char** argv) {
 
 
     // nearest drone position
-    if (r12 <= r13 && r12 <= r14)
+    if (r21 <= r23 && r21 <= r24)
     {
-      ROS_INFO("r12 is the smallest");
-      x_near=x_pos2;
-      y_near=y_pos2;
-      z_near=z_pos2;
+      ROS_INFO("r21 is the smallest");
+      x_near=x_pos1;
+      y_near=y_pos1;
+      z_near=z_pos1;
     }    
-    else if (r13 <= r12 && r13 <= r14)
+    else if (r23 <= r21 && r23 <= r24)
     {
-      ROS_INFO("r13 is the smallest");
+      ROS_INFO("r23 is the smallest");
       x_near=x_pos3;
       y_near=y_pos3;
       z_near=z_pos3;
     }
     else
     {
-      ROS_INFO("r14 is the smallest");
+      ROS_INFO("r24 is the smallest");
       x_near=x_pos4;
       y_near=y_pos4;
       z_near=z_pos4;
@@ -201,9 +201,9 @@ int main(int argc, char** argv) {
 
 
     // calculate new velocity to avoid collision
-    del_rx=x_pos1-x_near;
-    del_ry=y_pos1-y_near;
-    del_rz=z_pos1-z_near;
+    del_rx=x_pos2-x_near;
+    del_ry=y_pos2-y_near;
+    del_rz=z_pos2-z_near;
     mod_r=pow((pow(del_rx,2)+pow(del_ry,2)+pow(del_rz,2)),0.5);
     x_vel = x_vel + (del_rx/pow(mod_r,2));
     y_vel = y_vel + (del_ry/pow(mod_r,2));
@@ -221,7 +221,7 @@ int main(int argc, char** argv) {
 
 
 
-    ROS_INFO("position of firefly 1= %f %f %f",x_pos1,y_pos1,z_pos1);
+    ROS_INFO("position of firefly 1= %f %f %f",x_pos2,y_pos2,z_pos2);
     looprate.sleep();
   }
 
