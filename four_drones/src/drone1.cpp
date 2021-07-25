@@ -84,7 +84,8 @@ int main(int argc, char** argv) {
   
   ros::Subscriber pos_sub5 = nh.subscribe<nav_msgs::Odometry>
             ("/firefly1/odometry_sensor1/odometry",100,sub_odom_callback);
-
+  ros::Publisher cmd_vel_pub =nh.advertise<nav_msgs::Odometry>
+            ("/firefly1/odometry_sensor1/odometry",100);
 
 
   ROS_INFO("Started hovering");
@@ -146,7 +147,8 @@ int main(int argc, char** argv) {
   float r12,r13,r14;
   float x_near,y_near,z_near;
   float del_rx,del_ry,del_rz, mod_r;
-  
+  nav_msgs::Odometry vel_pub;
+
   while(ros::ok())
   {
     ros::spinOnce();
@@ -162,14 +164,14 @@ int main(int argc, char** argv) {
 
 
     // command drone to stop at its location in case relative distance is less than threshold
-    if (r12<0.7)
-    {
-      Eigen::Vector3d desired_position1(x_pos1, y_pos1, z_pos1);
-      double desired_yaw1 = 0;
-      mav_msgs::msgMultiDofJointTrajectoryFromPositionYaw(
-      desired_position1, desired_yaw1, &trajectory_msg);
-      trajectory_pub.publish(trajectory_msg);
-    }
+    // if (r12<0.7)
+    // {
+    //   Eigen::Vector3d desired_position1(x_pos1, y_pos1, z_pos1);
+    //   double desired_yaw1 = 0;
+    //   mav_msgs::msgMultiDofJointTrajectoryFromPositionYaw(
+    //   desired_position1, desired_yaw1, &trajectory_msg);
+    //   trajectory_pub.publish(trajectory_msg);
+    // }
 
 
 
@@ -203,14 +205,18 @@ int main(int argc, char** argv) {
     del_ry=y_pos1-y_near;
     del_rz=z_pos1-z_near;
     mod_r=pow((pow(del_rx,2)+pow(del_ry,2)+pow(del_rz,2)),0.5);
-    x_vel = x_vel + (del_rx/pow(mod_r,3));
-    y_vel = y_vel + (del_ry/pow(mod_r,3));
-    z_vel = z_vel + (del_rz/pow(mod_r,3));
+    x_vel = x_vel + (del_rx/pow(mod_r,2));
+    y_vel = y_vel + (del_ry/pow(mod_r,2));
+    z_vel = z_vel + (del_rz/pow(mod_r,2));
     
 
 
     // publish new velocity to avoid collision
-    
+    // method 1- 
+    vel_pub.twist.twist.linear.x=x_vel;
+    vel_pub.twist.twist.linear.y=y_vel;
+    vel_pub.twist.twist.linear.z=z_vel;
+    cmd_vel_pub.publish(vel_pub);
 
 
 
