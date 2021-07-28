@@ -22,7 +22,7 @@ void subcallback1(const geometry_msgs::PointStamped::ConstPtr &msg)
   x_pos1=data1.point.x;
   y_pos1=data1.point.y;
   z_pos1=data1.point.z;
-  ROS_INFO("position of firefly 1 ( from  function)= %f %f %f",x_pos1,y_pos1,z_pos1);
+  //ROS_INFO("position of firefly 1 ( from  function)= %f %f %f",x_pos1,y_pos1,z_pos1);
   return;
 }
 void subcallback2(const geometry_msgs::PointStamped::ConstPtr &msg)
@@ -31,7 +31,7 @@ void subcallback2(const geometry_msgs::PointStamped::ConstPtr &msg)
   x_pos2=data2.point.x;
   y_pos2=data2.point.y;
   z_pos2=data2.point.z;
-  ROS_INFO("position of firefly 2 ( from  function)= %f %f %f",x_pos2,y_pos2,z_pos2);
+  //ROS_INFO("position of firefly 2 ( from  function)= %f %f %f",x_pos2,y_pos2,z_pos2);
   return;
 }
 void subcallback3(const geometry_msgs::PointStamped::ConstPtr &msg)
@@ -40,7 +40,7 @@ void subcallback3(const geometry_msgs::PointStamped::ConstPtr &msg)
   x_pos3=data3.point.x;
   y_pos3=data3.point.y;
   z_pos3=data3.point.z;
-  ROS_INFO("position of firefly 3 ( from  function)= %f %f %f",x_pos3,y_pos3,z_pos3);
+  //ROS_INFO("position of firefly 3 ( from  function)= %f %f %f",x_pos3,y_pos3,z_pos3);
   return;
 }
 void subcallback4(const geometry_msgs::PointStamped::ConstPtr &msg)
@@ -49,7 +49,7 @@ void subcallback4(const geometry_msgs::PointStamped::ConstPtr &msg)
   x_pos4=data4.point.x;
   y_pos4=data4.point.y;
   z_pos4=data4.point.z;
-  ROS_INFO("position of firefly 4 ( from  function)= %f %f %f",x_pos4,y_pos4,z_pos4);
+  //ROS_INFO("position of firefly 4 ( from  function)= %f %f %f",x_pos4,y_pos4,z_pos4);
   return;
 }
 void sub_odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
@@ -58,7 +58,7 @@ void sub_odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
   x_vel=data5.twist.twist.linear.x;
   y_vel=data5.twist.twist.linear.y;
   z_vel=data5.twist.twist.linear.z;
-  ROS_INFO("velocity of firefly 4 (from  function)= %f %f %f",x_vel,y_vel,z_vel);
+  //ROS_INFO("velocity of firefly 4 (from  function)= %f %f %f",x_vel,y_vel,z_vel);
   return;
 }
 
@@ -114,7 +114,8 @@ int main(int argc, char** argv) {
   trajectory_msg.header.stamp = ros::Time::now();
 
   // Default desired position and yaw.
-  float x_coord,y_coord,z_coord,yaw_des,exp_r,radius,min_dist,arm_length,rate;
+  
+  float x_coord,y_coord,z_coord,yaw_des,exp_r,radius,min_dist,arm_length,rate,repel_const;
   nh.getParam("x_coord",x_coord);
   nh.getParam("y_coord",y_coord);
   nh.getParam("z_coord",z_coord);
@@ -124,8 +125,10 @@ int main(int argc, char** argv) {
   nh.getParam("rate", rate);
   nh.getParam("min_dist", min_dist);
   nh.getParam("arm_length", arm_length);
+  nh.getParam("repel_const", repel_const);
 
-  Eigen::Vector3d desired_position(x_coord+radius, y_coord-radius, z_coord+radius);
+
+  Eigen::Vector3d desired_position(x_coord+radius, y_coord-radius, z_coord);
   double desired_yaw = yaw_des;
 
   // Overwrite defaults if set as node parameters.
@@ -163,32 +166,32 @@ while(ros::ok())
     r41= pow((pow((x_pos4-x_pos1),2)+pow((y_pos4-y_pos1),2)+pow((z_pos4-z_pos1),2)),0.5);
     r42= pow((pow((x_pos4-x_pos2),2)+pow((y_pos4-y_pos2),2)+pow((z_pos4-z_pos2),2)),0.5);
     r43= pow((pow((x_pos4-x_pos3),2)+pow((y_pos4-y_pos3),2)+pow((z_pos4-z_pos3),2)),0.5);
-    ROS_INFO("R12 = %f, %f, %f",r41, r42, r43);
-    ROS_INFO("velocity of firefly 1 = %f %f %f",x_vel,y_vel,z_vel);
+    //ROS_INFO("R12 = %f, %f, %f",r41, r42, r43);
+    //ROS_INFO("velocity of firefly 1 = %f %f %f",x_vel,y_vel,z_vel);
 
 
   
     // command drone to stop at its location in case relative distance is less than threshold
-    if (r41+arm_length<min_dist || r42+arm_length<min_dist || r43+arm_length<min_dist)
+    if (r41<min_dist+arm_length || r42<min_dist+arm_length || r43<min_dist+arm_length)
     {
       // nearest drone position
-      if (r41 +arm_length<= r43 && r41+arm_length <= r42)
+      if (r41 <= r43 && r41 <= r42)
       {
-        ROS_INFO("r41 is the smallest");
+        //ROS_INFO("r41 is the smallest");
         x_near=x_pos1;
         y_near=y_pos1;
         z_near=z_pos1;
       }    
-      else if (r42 +arm_length<= r41 && r42 +arm_length<= r43)
+      else if (r42 <= r41 && r42 <= r43)
       {
-        ROS_INFO("r42 is the smallest");
+        //ROS_INFO("r42 is the smallest");
         x_near=x_pos2;
         y_near=y_pos2;
         z_near=z_pos2;
       }
       else
       {
-        ROS_INFO("r43 is the smallest");
+        //ROS_INFO("r43 is the smallest");
         x_near=x_pos3;
         y_near=y_pos3;
         z_near=z_pos3;
@@ -201,9 +204,9 @@ while(ros::ok())
       del_ry=y_pos4-y_near;
       del_rz=z_pos4-z_near;
       mod_r=pow((pow(del_rx,2)+pow(del_ry,2)+pow(del_rz,2)),0.5);
-      x_vel = x_vel - (del_rx/pow(mod_r,exp_r));
-      y_vel = y_vel - (del_ry/pow(mod_r,exp_r));
-      z_vel = z_vel - (del_rz/pow(mod_r,exp_r));
+      x_vel = x_vel - repel_const*(del_rx/pow(mod_r,exp_r));
+      y_vel = y_vel - repel_const*(del_ry/pow(mod_r,exp_r));
+      z_vel = z_vel - repel_const*(del_rz/pow(mod_r,exp_r));
       
 
 
@@ -215,15 +218,9 @@ while(ros::ok())
       cmd_vel_pub.publish(vel_pub);
       
     }
-
-
-
     
 
-
-
-
-    ROS_INFO("position of firefly 1= %f %f %f",x_pos1,y_pos1,z_pos1);
+    //ROS_INFO("position of firefly 1= %f %f %f",x_pos1,y_pos1,z_pos1);
     looprate.sleep();
   }
 
