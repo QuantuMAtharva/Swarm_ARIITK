@@ -220,14 +220,8 @@ int main(int argc, char** argv) {
       cmd_vel_pub.publish(vel_pub);
     }
 
-
-
-    
-
-
-
-
-    //ROS_INFO("position of firefly 1= %f %f %f",x_pos2,y_pos2,z_pos2);
+  
+     //ROS_INFO("position of firefly 1= %f %f %f",x_pos2,y_pos2,z_pos2);
     looprate.sleep();
   }
 

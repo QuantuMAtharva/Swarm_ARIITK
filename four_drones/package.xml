@@ -68,6 +68,7 @@
   <depend>std_msgs</depend>
   <depend>std_srvs</depend>
   <depend>nav_msgs</depend>
+  <depend>mav_disturbance_observer</depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

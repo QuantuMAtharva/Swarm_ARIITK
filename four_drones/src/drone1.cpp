@@ -2,6 +2,7 @@
 #include <chrono>
 #include <geometry_msgs/PointStamped.h>
 #include <nav_msgs/Odometry.h>
+#include <mav_disturbance_observer/ObserverState.h>
 #include <Eigen/Core>
 #include <mav_msgs/conversions.h>
 #include <mav_msgs/default_topics.h>
@@ -11,8 +12,8 @@
 #include <cmath>
 
 geometry_msgs::PointStamped data1,data2,data3,data4;
-nav_msgs::Odometry data5;
-
+// nav_msgs::Odometry data5;
+mav_disturbance_observer::ObserverState data5;
 
 float x_pos1,y_pos1,z_pos1,x_pos2,y_pos2,z_pos2,x_pos3,y_pos3,z_pos3,x_pos4,y_pos4,z_pos4;
 float x_vel,y_vel,z_vel;
@@ -52,13 +53,16 @@ void subcallback4(const geometry_msgs::PointStamped::ConstPtr &msg)
   //ROS_INFO("position of firefly 4 ( from  function)= %f %f %f",x_pos4,y_pos4,z_pos4);
   return;
 }
-void sub_odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
+void sub_odom_callback(const mav_disturbance_observer::ObserverState::ConstPtr &msg)
 {
   data5=*msg;
-  x_vel=data5.twist.twist.linear.x;
-  y_vel=data5.twist.twist.linear.y;
-  z_vel=data5.twist.twist.linear.z;
-  //ROS_INFO("velocity of firefly 1 (from  function)= %f %f %f",x_vel,y_vel,z_vel);
+  x_vel=data5.velocity[0];
+  y_vel=data5.velocity[1];
+  z_vel=data5.velocity[2];
+  // x_vel=data5.twist.twist.linear.x;
+  // y_vel=data5.twist.twist.linear.y;
+  // z_vel=data5.twist.twist.linear.z;
+  ROS_INFO("velocity of firefly 1 (from  function)= %f %f %f",x_vel,y_vel,z_vel);
   return;
 }
 
@@ -82,10 +86,10 @@ int main(int argc, char** argv) {
   ros::Subscriber pos_sub4 = nh.subscribe<geometry_msgs::PointStamped>
             ("/firefly4/ground_truth/position",100,subcallback4);
   
-  ros::Subscriber pos_sub5 = nh.subscribe<nav_msgs::Odometry>
-            ("/firefly1/odometry_sensor1/odometry",100,sub_odom_callback);
-  ros::Publisher cmd_vel_pub =nh.advertise<nav_msgs::Odometry>
-            ("/firefly1/odometry_sensor1/odometry",100);
+  ros::Subscriber pos_sub5 = nh.subscribe<mav_disturbance_observer::ObserverState>
+            ("/firefly1/mav_linear_mpc/KF_observer/observer_state",100,sub_odom_callback);
+  ros::Publisher cmd_vel_pub =nh.advertise<trajectory_msgs::MultiDOFJointTrajectory>
+            ("/firefly1/command/current_reference",100);
 
 
   ROS_INFO("Started hovering");
@@ -154,7 +158,8 @@ int main(int argc, char** argv) {
   float r12,r13,r14;
   float x_near,y_near,z_near;
   float del_rx,del_ry,del_rz, mod_r;
-  nav_msgs::Odometry vel_pub;
+  trajectory_msgs::MultiDOFJointTrajectory vel_pub;
+  
 
   while(ros::ok())
   {
@@ -211,10 +216,16 @@ int main(int argc, char** argv) {
 
       // publish new velocity to avoid collision
       // method 1- 
-      vel_pub.twist.twist.linear.x=x_vel;
-      vel_pub.twist.twist.linear.y=y_vel;
-      vel_pub.twist.twist.linear.z=z_vel;
+
+
+
+      vel_pub.points[0].velocities[0].linear.x=100;
+      vel_pub.points[0].velocities[0].linear.y=y_vel;
+      vel_pub.points[0].velocities[0].linear.z=z_vel;
+      // vel_pub.velocity[1]=y_vel;
+      // vel_pub.velocity[2]=z_vel;
       cmd_vel_pub.publish(vel_pub);
+      
     }
 
 
