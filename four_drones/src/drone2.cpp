@@ -114,10 +114,10 @@ int main(int argc, char** argv) {
   nh.getParam("repel_const", repel_const);
 
 
-  ROS_INFO("Publishing waypoint on namespace %s: [%f, %f, %f].",nh.getNamespace().c_str(),x_coord+radius,y_coord+radius, z_coord);
+  ROS_INFO("Publishing waypoint on namespace %s: [%f, %f, %f].",nh.getNamespace().c_str(),x_coord-radius,y_coord-radius, z_coord);
   
-  trajectory_msg.pose.position.x=x_coord+radius;
-  trajectory_msg.pose.position.y=y_coord+radius;
+  trajectory_msg.pose.position.x=x_coord-radius;
+  trajectory_msg.pose.position.y=y_coord-radius;
   trajectory_msg.pose.position.z=z_coord;
 
   pos_pub.publish(trajectory_msg);

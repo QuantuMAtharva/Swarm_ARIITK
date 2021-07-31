@@ -168,7 +168,6 @@ int main(int argc, char** argv) {
   {
     ros::spinOnce();
 
-
     // calculate realtive distance of drones
     r12= pow((pow((x_pos1-x_pos2),2)+pow((y_pos1-y_pos2),2)+pow((z_pos1-z_pos2),2)),0.5);
     r13= pow((pow((x_pos1-x_pos3),2)+pow((y_pos1-y_pos3),2)+pow((z_pos1-z_pos3),2)),0.5);
