@@ -141,6 +141,11 @@ target_link_libraries(drone1
   ${catkin_LIBRARIES}
 )
 
+add_executable(square src/square.cpp)
+target_link_libraries(square
+  ${catkin_LIBRARIES}
+)
+
 add_executable(drone2 src/drone2.cpp)
 target_link_libraries(drone2
   ${catkin_LIBRARIES}

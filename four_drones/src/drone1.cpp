@@ -150,7 +150,7 @@ int main(int argc, char** argv) {
   trajectory_msg.pose.position.y=y_coord+radius;
   trajectory_msg.pose.position.z=z_coord;
 
-  pos_pub.publish(trajectory_msg);
+  //pos_pub.publish(trajectory_msg);
   ros::spinOnce();
 
   ros::Rate looprate(rate);

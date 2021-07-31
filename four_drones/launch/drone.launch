@@ -57,6 +57,7 @@
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <rosparam file="$(find four_drones)/config/params.yaml"/>
     <node name="drone1" pkg="four_drones" type="drone1" output="screen"/>
+    <node name="square" pkg="four_drones" type="square" output="screen"/>
   </group>
 
   <group ns="$(arg mav_name)2">
