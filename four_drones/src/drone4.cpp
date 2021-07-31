@@ -52,15 +52,15 @@ void subcallback4(const geometry_msgs::PointStamped::ConstPtr &msg)
   //ROS_INFO("position of firefly 4 ( from  function)= %f %f %f",x_pos4,y_pos4,z_pos4);
   return;
 }
-void sub_odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
-{
-  data5=*msg;
-  x_vel=data5.twist.twist.linear.x;
-  y_vel=data5.twist.twist.linear.y;
-  z_vel=data5.twist.twist.linear.z;
-  //ROS_INFO("velocity of firefly 4 (from  function)= %f %f %f",x_vel,y_vel,z_vel);
-  return;
-}
+// void sub_odom_callback(const nav_msgs::Odometry::ConstPtr &msg)
+// {
+//   data5=*msg;
+//   x_vel=data5.twist.twist.linear.x;
+//   y_vel=data5.twist.twist.linear.y;
+//   z_vel=data5.twist.twist.linear.z;
+//   //ROS_INFO("velocity of firefly 4 (from  function)= %f %f %f",x_vel,y_vel,z_vel);
+//   return;
+// }
 
 int main(int argc, char** argv) {
   ros::init(argc, argv, "drone4");
@@ -80,10 +80,13 @@ int main(int argc, char** argv) {
   ros::Subscriber pos_sub4 = nh.subscribe<geometry_msgs::PointStamped>
             ("/firefly4/ground_truth/position",100,subcallback4);
   
-  ros::Subscriber pos_sub5 = nh.subscribe<nav_msgs::Odometry>
-            ("/firefly4/odometry_sensor1/odometry",100,sub_odom_callback);
-  ros::Publisher cmd_vel_pub =nh.advertise<nav_msgs::Odometry>
-            ("/firefly4/odometry_sensor1/odometry",100);
+  // ros::Subscriber pos_sub5 = nh.subscribe<nav_msgs::Odometry>
+  //           ("/firefly4/odometry_sensor1/odometry",100,sub_odom_callback);
+  // ros::Publisher cmd_vel_pub =nh.advertise<nav_msgs::Odometry>
+  //           ("/firefly4/odometry_sensor1/odometry",100);
+
+  ros::Publisher pos_pub = nh.advertise<geometry_msgs::PoseStamped>
+            ("/firefly4/command/pose",100);
 
   // ROS_INFO("Started hovering");
   // std_srvs::Empty srv;
@@ -92,20 +95,7 @@ int main(int argc, char** argv) {
 
 
 
-  // // Trying to unpause Gazebo for 20 seconds.
-  // while (i <= 20 && !unpaused) {
-  //   ROS_INFO("Wait for 1 second before trying to unpause Gazebo again.");
-  //   std::this_thread::sleep_for(std::chrono::seconds(1));
-  //   unpaused = ros::service::call("/gazebo/unpause_physics", srv);
-  //   ++i;
-  // }
-  // if (!unpaused) {
-  //   ROS_FATAL("Could not wake up Gazebo.");
-  //   return -1;
-  // } else {
-  //   ROS_INFO("Unpaused the Gazebo simulation.");
-  // }
-  // // Wait for 5 seconds to let the Gazebo GUI show up.
+ 
   ros::Duration(5.0).sleep();
 
 
@@ -149,8 +139,10 @@ int main(int argc, char** argv) {
 
   float r41,r42,r43;
   float x_near,y_near,z_near;
+  float tar_x,tar_y,tar_z;
   float del_rx,del_ry,del_rz, mod_r;
   nav_msgs::Odometry vel_pub;
+  geometry_msgs::PoseStamped pose;
 
 
 
@@ -204,18 +196,21 @@ while(ros::ok())
       del_ry=y_pos4-y_near;
       del_rz=z_pos4-z_near;
       mod_r=pow((pow(del_rx,2)+pow(del_ry,2)+pow(del_rz,2)),0.5);
-      x_vel = x_vel - repel_const*(del_rx/pow(mod_r,exp_r));
-      y_vel = y_vel - repel_const*(del_ry/pow(mod_r,exp_r));
-      z_vel = z_vel - repel_const*(del_rz/pow(mod_r,exp_r));
+      tar_x = x_pos4 + repel_const*(del_rx/pow(mod_r,exp_r));
+      tar_y = y_pos4 + repel_const*(del_ry/pow(mod_r,exp_r));
+      tar_z = z_pos4 + repel_const*(del_rz/pow(mod_r,exp_r));
       
 
+      pose.pose.position.x=tar_x;
+      pose.pose.position.y=tar_y;
+      pose.pose.position.z=tar_z;
 
-      // publish new velocity to avoid collision
-      // method 1- 
-      vel_pub.twist.twist.linear.x=x_vel;
-      vel_pub.twist.twist.linear.y=y_vel;
-      vel_pub.twist.twist.linear.z=z_vel;
-      cmd_vel_pub.publish(vel_pub);
+      pos_pub.publish(pose);
+
+      pose.pose.position.x=x_coord+radius;
+      pose.pose.position.y=y_coord-radius;
+      pose.pose.position.z=tar_z;
+      pos_pub.publish(pose);
       
     }
     

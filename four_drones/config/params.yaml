@@ -7,4 +7,4 @@ min_dist: 0.4
 arm_length: 0.53
 rate: 10.0
 exp_r: 2.0
-repel_const: 120
+repel_const: 1
