@@ -11,7 +11,7 @@
 #include <cmath>
 
 geometry_msgs::PointStamped data1,data2,data3,data4;
-nav_msgs::Odometry data5;
+// nav_msgs::Odometry data5;
 
 
 float x_pos1,y_pos1,z_pos1,x_pos2,y_pos2,z_pos2,x_pos3,y_pos3,z_pos3,x_pos4,y_pos4,z_pos4;
@@ -67,9 +67,9 @@ int main(int argc, char** argv) {
   ros::NodeHandle nh;
   // Create a private node handle for accessing node parameters.
   ros::NodeHandle nh_private("~");
-  ros::Publisher trajectory_pub =
-      nh.advertise<trajectory_msgs::MultiDOFJointTrajectory>(
-          mav_msgs::default_topics::COMMAND_TRAJECTORY, 10);
+  // ros::Publisher trajectory_pub =
+  //     nh.advertise<trajectory_msgs::MultiDOFJointTrajectory>(
+  //         mav_msgs::default_topics::COMMAND_TRAJECTORY, 10);
 
   ros::Subscriber pos_sub1 = nh.subscribe<geometry_msgs::PointStamped>
             ("/firefly1/ground_truth/position",100,subcallback1);
@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
 
 
 
-  trajectory_msgs::MultiDOFJointTrajectory trajectory_msg;
+  geometry_msgs::PoseStamped trajectory_msg;
   trajectory_msg.header.stamp = ros::Time::now();
 
   // Default desired position and yaw.
@@ -118,24 +118,17 @@ int main(int argc, char** argv) {
   nh.getParam("repel_const", repel_const);
 
 
-  Eigen::Vector3d desired_position(x_coord+radius, y_coord-radius, z_coord);
-  double desired_yaw = yaw_des;
+  ROS_INFO("Publishing waypoint on namespace %s: [%f, %f, %f].",nh.getNamespace().c_str(),x_coord+radius,y_coord+radius, z_coord);
+  
+  trajectory_msg.pose.position.x=x_coord+radius;
+  trajectory_msg.pose.position.y=y_coord+radius;
+  trajectory_msg.pose.position.z=z_coord;
 
-  // Overwrite defaults if set as node parameters.
-  nh_private.param("x", desired_position.x(), desired_position.x());
-  nh_private.param("y", desired_position.y(), desired_position.y());
-  nh_private.param("z", desired_position.z(), desired_position.z());
-  nh_private.param("yaw", desired_yaw, desired_yaw);
-
-  mav_msgs::msgMultiDofJointTrajectoryFromPositionYaw(
-      desired_position, desired_yaw, &trajectory_msg);
-
-  ROS_INFO("Publishing waypoint on namespace %s: [%f, %f, %f].",
-           nh.getNamespace().c_str(), desired_position.x(),
-           desired_position.y(), desired_position.z());
-  trajectory_pub.publish(trajectory_msg);
+  pos_pub.publish(trajectory_msg);
   ros::spinOnce();
   ros::Rate looprate(rate);
+
+
 
   float r41,r42,r43;
   float x_near,y_near,z_near;
@@ -143,11 +136,6 @@ int main(int argc, char** argv) {
   float del_rx,del_ry,del_rz, mod_r;
   nav_msgs::Odometry vel_pub;
   geometry_msgs::PoseStamped pose;
-
-
-
-
-
 
 while(ros::ok())
   {

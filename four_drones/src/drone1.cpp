@@ -2,9 +2,6 @@
 #include <chrono>
 #include <geometry_msgs/PointStamped.h>
 #include <geometry_msgs/PoseStamped.h>
-#include <nav_msgs/Odometry.h>
-#include <mav_disturbance_observer/ObserverState.h>
-#include <Eigen/Core>
 #include <mav_msgs/conversions.h>
 #include <mav_msgs/default_topics.h>
 #include <ros/ros.h>
@@ -14,7 +11,7 @@
 
 geometry_msgs::PointStamped data1,data2,data3,data4;
 // nav_msgs::Odometry data5;
-mav_disturbance_observer::ObserverState data5;
+// mav_disturbance_observer::ObserverState data5;
 
 float x_pos1,y_pos1,z_pos1,x_pos2,y_pos2,z_pos2,x_pos3,y_pos3,z_pos3,x_pos4,y_pos4,z_pos4;
 float x_vel,y_vel,z_vel;
@@ -74,9 +71,9 @@ int main(int argc, char** argv) {
   // Create a private node handle for accessing node parameters.
   ros::NodeHandle nh_private("~");
 
-  ros::Publisher trajectory_pub =
-      nh.advertise<trajectory_msgs::MultiDOFJointTrajectory>(
-          mav_msgs::default_topics::COMMAND_TRAJECTORY, 10);
+  // ros::Publisher trajectory_pub =
+  //     nh.advertise<trajectory_msgs::MultiDOFJointTrajectory>(
+  //         mav_msgs::default_topics::COMMAND_TRAJECTORY, 10);
 
   ros::Subscriber pos_sub1 = nh.subscribe<geometry_msgs::PointStamped>
             ("/firefly1/ground_truth/position",100,subcallback1);
@@ -118,7 +115,7 @@ int main(int argc, char** argv) {
 
 
 
-  trajectory_msgs::MultiDOFJointTrajectory trajectory_msg;
+  geometry_msgs::PoseStamped trajectory_msg;
   trajectory_msg.header.stamp = ros::Time::now();
 
 
@@ -135,24 +132,25 @@ int main(int argc, char** argv) {
   nh.getParam("arm_length", arm_length);
   nh.getParam("repel_const", repel_const);
 
-  Eigen::Vector3d desired_position(x_coord+radius, y_coord+radius, z_coord);
-  double desired_yaw = yaw_des;
+  // Eigen::Vector3d desired_position(x_coord+radius, y_coord+radius, z_coord);
+  // double desired_yaw = yaw_des;
 
   // Overwrite defaults if set as node parameters.
-  nh_private.param("x", desired_position.x(), desired_position.x());
-  nh_private.param("y", desired_position.y(), desired_position.y());
-  nh_private.param("z", desired_position.z(), desired_position.z());
-  nh_private.param("yaw", desired_yaw, desired_yaw);
+  // nh_private.param("x", desired_position.x(), desired_position.x());
+  // nh_private.param("y", desired_position.y(), desired_position.y());
+  // nh_private.param("z", desired_position.z(), desired_position.z());
+  // nh_private.param("yaw", desired_yaw, desired_yaw);
 
-  mav_msgs::msgMultiDofJointTrajectoryFromPositionYaw(
-      desired_position, desired_yaw, &trajectory_msg);
+  // mav_msgs::msgMultiDofJointTrajectoryFromPositionYaw(
+  //     desired_position, desired_yaw, &trajectory_msg);
 
-  ROS_INFO("Publishing waypoint on namespace %s: [%f, %f, %f].",
-           nh.getNamespace().c_str(), desired_position.x(),
-           desired_position.y(), desired_position.z());
+  ROS_INFO("Publishing waypoint on namespace %s: [%f, %f, %f].",nh.getNamespace().c_str(),x_coord+radius,y_coord+radius, z_coord);
   
+  trajectory_msg.pose.position.x=x_coord+radius;
+  trajectory_msg.pose.position.y=y_coord+radius;
+  trajectory_msg.pose.position.z=z_coord;
 
-  trajectory_pub.publish(trajectory_msg);
+  pos_pub.publish(trajectory_msg);
   ros::spinOnce();
 
   ros::Rate looprate(rate);
@@ -227,7 +225,7 @@ int main(int argc, char** argv) {
 
       for(int i=0;i<5;i++){
         ros::spinOnce();
-        looprate.sleep(); // 100/20= 5sec of wait for things to get connected (maybe)
+        looprate.sleep(); // 5/10= 0.5 sec of wait
       }
 
       
@@ -235,8 +233,6 @@ int main(int argc, char** argv) {
       pose.pose.position.y=y_coord+radius;
       pose.pose.position.z=z_coord;
       pos_pub.publish(pose);
-      
-      
     }
 
 
