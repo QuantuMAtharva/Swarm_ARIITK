@@ -203,10 +203,14 @@ int main(int argc, char** argv) {
 
       pos_pub.publish(pose);
 
+      for(int i=0;i<5;i++){
+        ros::spinOnce();
+        looprate.sleep(); // 100/20= 5sec of wait for things to get connected (maybe)
+      }
 
       pose.pose.position.x=x_coord-radius;
       pose.pose.position.y=y_coord-radius;
-      pose.pose.position.z=tar_z;
+      pose.pose.position.z=z_coord;
       pos_pub.publish(pose);
     }
 
