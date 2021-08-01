@@ -96,6 +96,7 @@
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <rosparam file="$(find four_drones)/config/params.yaml"/>
     <node name="drone2" pkg="four_drones" type="drone2" output="screen"/>
+    <node name="square" pkg="four_drones" type="square" output="screen"/>
   </group>
 
   <group ns="$(arg mav_name)3">
@@ -134,6 +135,7 @@
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <rosparam file="$(find four_drones)/config/params.yaml"/>
     <node name="drone3" pkg="four_drones" type="drone3" output="screen"/>
+    <node name="square" pkg="four_drones" type="square" output="screen"/>
   </group>
 
   <group ns="$(arg mav_name)4">
@@ -172,6 +174,7 @@
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <rosparam file="$(find four_drones)/config/params.yaml"/>
     <node name="drone4" pkg="four_drones" type="drone4" output="screen"/>
+    <node name="square" pkg="four_drones" type="square" output="screen"/>
   </group>
 
 </launch>
