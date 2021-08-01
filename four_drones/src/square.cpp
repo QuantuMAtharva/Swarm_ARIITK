@@ -57,90 +57,90 @@ void subcallback4(const geometry_msgs::PointStamped::ConstPtr &msg)
 
 int main(int argc, char** argv){
 
-    ros::init(argc, argv, "square");
-    ros::NodeHandle nh;
-    ros::Subscriber pos_sub1 = nh.subscribe<geometry_msgs::PointStamped>
-            ("/firefly1/ground_truth/position",100,subcallback1);
-        ros::Subscriber pos_sub2 = nh.subscribe<geometry_msgs::PointStamped>
-            ("/firefly2/ground_truth/position",100,subcallback2);
-        ros::Subscriber pos_sub3 = nh.subscribe<geometry_msgs::PointStamped>
-            ("/firefly3/ground_truth/position",100,subcallback3);
-        ros::Subscriber pos_sub4 = nh.subscribe<geometry_msgs::PointStamped>
-            ("/firefly4/ground_truth/position",100,subcallback4);
+  ros::init(argc, argv, "square");
+  ros::NodeHandle nh;
+  ros::Subscriber pos_sub1 = nh.subscribe<geometry_msgs::PointStamped>
+          ("/firefly1/ground_truth/position",100,subcallback1);
+      ros::Subscriber pos_sub2 = nh.subscribe<geometry_msgs::PointStamped>
+          ("/firefly2/ground_truth/position",100,subcallback2);
+      ros::Subscriber pos_sub3 = nh.subscribe<geometry_msgs::PointStamped>
+          ("/firefly3/ground_truth/position",100,subcallback3);
+      ros::Subscriber pos_sub4 = nh.subscribe<geometry_msgs::PointStamped>
+          ("/firefly4/ground_truth/position",100,subcallback4);
 
-        ros::Publisher pos_pub1 = nh.advertise<geometry_msgs::PoseStamped>
-            ("/firefly1/command/pose",100);
-        ros::Publisher pos_pub2 = nh.advertise<geometry_msgs::PoseStamped>
-            ("/firefly2/command/pose",100);
-        ros::Publisher pos_pub3 = nh.advertise<geometry_msgs::PoseStamped>
-            ("/firefly3/command/pose",100);
-        ros::Publisher pos_pub4 = nh.advertise<geometry_msgs::PoseStamped>
-            ("/firefly4/command/pose",100);
-        
-        float radius;
-        nh.getParam("radius",radius);
+      ros::Publisher pos_pub1 = nh.advertise<geometry_msgs::PoseStamped>
+          ("/firefly1/command/pose",100);
+      ros::Publisher pos_pub2 = nh.advertise<geometry_msgs::PoseStamped>
+          ("/firefly2/command/pose",100);
+      ros::Publisher pos_pub3 = nh.advertise<geometry_msgs::PoseStamped>
+          ("/firefly3/command/pose",100);
+      ros::Publisher pos_pub4 = nh.advertise<geometry_msgs::PoseStamped>
+          ("/firefly4/command/pose",100);
+      
+      float radius;
+      nh.getParam("radius",radius);
 
+  //ROS_INFO("position of firefly 1= %f %f %f",x_pos1,y_pos1,z_pos1);
+  float side = 10;
+  float x1,x2,x3,x4,y1,y2,y3,y4,z=5;
+  float x[4],y[4];
+  ros::Rate looprate(100);
+
+  x[0]=side;  y[0]=side;
+  x[1]=-side; y[1]=side;
+  x[2]=-side; y[2]=-side;
+  x[3]=side;  y[3]=-side;
+
+  geometry_msgs::PoseStamped trajectory_msg1,trajectory_msg2,trajectory_msg3,trajectory_msg4;
+
+  while(ros::ok())
+  {
+    ros::spinOnce();
     //ROS_INFO("position of firefly 1= %f %f %f",x_pos1,y_pos1,z_pos1);
-    float side = 10;
-    float x1,x2,x3,x4,y1,y2,y3,y4,z=5;
-    float x[4],y[4];
-    ros::Rate looprate(100);
-
-    x[0]=side;  y[0]=side;
-    x[1]=-side; y[1]=side;
-    x[2]=-side; y[2]=-side;
-    x[3]=side;  y[3]=-side;
-
-    geometry_msgs::PoseStamped trajectory_msg1,trajectory_msg2,trajectory_msg3,trajectory_msg4;
-
-    while(ros::ok())
+    for (int i=0;i<4;i++)
     {
+      for (int j=1;j<5;j++)
+      {
+        trajectory_msg1.pose.position.x=x[i]+radius;
+        trajectory_msg1.pose.position.y=y[i]+radius;
+        trajectory_msg1.pose.position.z=z;
+
+        trajectory_msg2.pose.position.x=x[i]-radius;
+        trajectory_msg2.pose.position.y=y[i]-radius;
+        trajectory_msg2.pose.position.z=z;
+
+        trajectory_msg3.pose.position.x=x[i]-radius;
+        trajectory_msg3.pose.position.y=y[i]+radius;
+        trajectory_msg3.pose.position.z=z;
+
+        trajectory_msg4.pose.position.x=x[i]+radius;
+        trajectory_msg4.pose.position.y=y[i]-radius;
+        trajectory_msg4.pose.position.z=z;
+      }
+
+      // pos_pub1.publish(trajectory_msg1);
+
+      float r1 = sqrt(pow(x_pos1-(x[i]+radius),2)+pow(y_pos1-(y[i]+radius),2)+pow(z_pos1-z,2));
+      // float r2 = sqrt(pow(x_pos2-(x[i]-radius),2)+pow(y_pos2-(y[i]-radius),2)+pow(z_pos2-z,2));
+      // float r3 = sqrt(pow(x_pos3-(x[i]-radius),2)+pow(y_pos3-(y[i]+radius),2)+pow(z_pos3-z,2));
+      // float r4 = sqrt(pow(x_pos4-(x[i]+radius),2)+pow(y_pos4-(y[i]-radius),2)+pow(z_pos4-z,2));
+      
+      while(r1 > 0.5)
+      {       
         ros::spinOnce();
-        //ROS_INFO("position of firefly 1= %f %f %f",x_pos1,y_pos1,z_pos1);
-        for (int i=0;i<4;i++)
-        {
-                for (int j=1;j<5;j++)
-                {
-                        trajectory_msg1.pose.position.x=x[i]+radius;
-                        trajectory_msg1.pose.position.y=y[i]+radius;
-                        trajectory_msg1.pose.position.z=z;
+        pos_pub1.publish(trajectory_msg1);
+        pos_pub2.publish(trajectory_msg2);
+        pos_pub3.publish(trajectory_msg3);
+        pos_pub4.publish(trajectory_msg4);
 
-                        trajectory_msg2.pose.position.x=x[i]-radius;
-                        trajectory_msg2.pose.position.y=y[i]-radius;
-                        trajectory_msg2.pose.position.z=z;
-
-                        trajectory_msg3.pose.position.x=x[i]-radius;
-                        trajectory_msg3.pose.position.y=y[i]+radius;
-                        trajectory_msg3.pose.position.z=z;
-
-                        trajectory_msg4.pose.position.x=x[i]+radius;
-                        trajectory_msg4.pose.position.y=y[i]-radius;
-                        trajectory_msg4.pose.position.z=z;
-                }
-
-                // pos_pub1.publish(trajectory_msg1);
-
-                float r1 = sqrt(pow(x_pos1-(x[i]+radius),2)+pow(y_pos1-(y[i]+radius),2)+pow(z_pos1-z,2));
-                float r2 = sqrt(pow(x_pos2-(x[i]-radius),2)+pow(y_pos2-(y[i]-radius),2)+pow(z_pos2-z,2));
-                float r3 = sqrt(pow(x_pos3-(x[i]-radius),2)+pow(y_pos3-(y[i]+radius),2)+pow(z_pos3-z,2));
-                float r4 = sqrt(pow(x_pos4-(x[i]+radius),2)+pow(y_pos4-(y[i]-radius),2)+pow(z_pos4-z,2));
-                
-                while(r1 > 0.5)
-                {       
-                        ros::spinOnce();
-                        pos_pub1.publish(trajectory_msg1);
-                        pos_pub2.publish(trajectory_msg2);
-                        pos_pub3.publish(trajectory_msg3);
-                        pos_pub4.publish(trajectory_msg4);
-
-                        r1 = sqrt(pow(x_pos1-(x[i]+radius),2)+pow(y_pos1-(y[i]+radius),2)+pow(z_pos1-z,2));
-                        r2 = sqrt(pow(x_pos2-(x[i]-radius),2)+pow(y_pos2-(y[i]-radius),2)+pow(z_pos2-z,2));
-                        r3 = sqrt(pow(x_pos3-(x[i]-radius),2)+pow(y_pos3-(y[i]+radius),2)+pow(z_pos3-z,2));
-                        r4 = sqrt(pow(x_pos4-(x[i]+radius),2)+pow(y_pos4-(y[i]-radius),2)+pow(z_pos4-z,2));
-                
-                }
-        }
-        looprate.sleep();
+        r1 = sqrt(pow(x_pos1-(x[i]+radius),2)+pow(y_pos1-(y[i]+radius),2)+pow(z_pos1-z,2));
+        // r2 = sqrt(pow(x_pos2-(x[i]-radius),2)+pow(y_pos2-(y[i]-radius),2)+pow(z_pos2-z,2));
+        // r3 = sqrt(pow(x_pos3-(x[i]-radius),2)+pow(y_pos3-(y[i]+radius),2)+pow(z_pos3-z,2));
+        // r4 = sqrt(pow(x_pos4-(x[i]+radius),2)+pow(y_pos4-(y[i]-radius),2)+pow(z_pos4-z,2));
+      
+      }
     }
+    looprate.sleep();
+  }
 
 }
