@@ -21,7 +21,7 @@ void subcallback1(const geometry_msgs::PointStamped::ConstPtr &msg)
   x_pos1=data1.point.x;
   y_pos1=data1.point.y;
   z_pos1=data1.point.z;
-  //ROS_INFO("position of firefly 1 ( from  function)= %f %f %f",x_pos1,y_pos1,z_pos1);
+  // ROS_INFO("position of firefly 1 ( from  function)= %f %f %f",x_pos1,y_pos1,z_pos1);
   return;
 }
 void subcallback2(const geometry_msgs::PointStamped::ConstPtr &msg)

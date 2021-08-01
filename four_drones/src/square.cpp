@@ -23,13 +23,13 @@ void subcallback1(const geometry_msgs::PointStamped::ConstPtr &msg)
   x_pos1=data1.point.x;
   y_pos1=data1.point.y;
   z_pos1=data1.point.z;
-  ROS_INFO("position of firefly 1 ( from  function)= %f %f %f",x_pos1,y_pos1,z_pos1);
+//   ROS_INFO("position of firefly 1 ( from  function)= %f %f %f",x_pos1,y_pos1,z_pos1);
   return;
 }
 
 
-int main(int argc, char** argv) 
-{
+int main(int argc, char** argv){
+
     ros::init(argc, argv, "square");
     ros::NodeHandle nh;
     ros::Subscriber pos_sub1 = nh.subscribe<geometry_msgs::PointStamped>
@@ -38,9 +38,11 @@ int main(int argc, char** argv)
     ros::Publisher pos_pub = nh.advertise<geometry_msgs::PoseStamped>
             ("/firefly1/command/pose",100);
     
+    //ROS_INFO("position of firefly 1= %f %f %f",x_pos1,y_pos1,z_pos1);
     float side = 10;
     float x1,x2,x3,x4,y1,y2,y3,y4,z=5;
     float x[4],y[4];
+    ros::Rate looprate(100);
 
     x[0]=side;  y[0]=side;
     x[1]=-side; y[1]=side;
@@ -49,6 +51,10 @@ int main(int argc, char** argv)
 
     geometry_msgs::PoseStamped trajectory_msg;
 
+    while(ros::ok())
+    {
+        ros::spinOnce();
+        //ROS_INFO("position of firefly 1= %f %f %f",x_pos1,y_pos1,z_pos1);
         for (int i=0;i<4;i++)
         {
                 trajectory_msg.pose.position.x=x[i];
@@ -57,13 +63,20 @@ int main(int argc, char** argv)
 
                 pos_pub.publish(trajectory_msg);
 
-                float r=sqrt(pow(x_pos1-x[i],2)+pow(y_pos1-y[i],2)+pow(z_pos1-z,2));
+                float r = sqrt(pow(x_pos1-x[i],2)+pow(y_pos1-y[i],2)+pow(z_pos1-z,2));
                 
-                while(r > 0.05)
-                {
-                        continue;
+                while(r > 0.5)
+                {       ros::spinOnce();
+                        // ROS_INFO("distance from target -> firefly 1= %f",r);
+                        pos_pub.publish(trajectory_msg);
+                        r = sqrt(pow(x_pos1-x[i],2)+pow(y_pos1-y[i],2)+pow(z_pos1-z,2));
+                        // looprate.sleep();
                 }
         }
+        looprate.sleep();
+    }
+
+        
 
 
 }

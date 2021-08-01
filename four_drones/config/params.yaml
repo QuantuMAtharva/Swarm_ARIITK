@@ -1,9 +1,9 @@
 x_coord: 5.0
-y_coord: 6.0
+y_coord: 10.0
 z_coord: 5.0
 yaw_des: 0.0
 radius: 0.5
-min_dist: 0.35
+min_dist: 0.4
 arm_length: 0.53
 rate: 10.0
 exp_r: 2.0
