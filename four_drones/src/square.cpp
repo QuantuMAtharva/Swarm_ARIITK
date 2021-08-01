@@ -120,21 +120,27 @@ int main(int argc, char** argv){
 
                 // pos_pub1.publish(trajectory_msg1);
 
-                float r = sqrt(pow(x_pos1-x[i],2)+pow(y_pos1-y[i],2)+pow(z_pos1-z,2));
+                float r1 = sqrt(pow(x_pos1-(x[i]+radius),2)+pow(y_pos1-(y[i]+radius),2)+pow(z_pos1-z,2));
+                float r2 = sqrt(pow(x_pos2-(x[i]-radius),2)+pow(y_pos2-(y[i]-radius),2)+pow(z_pos2-z,2));
+                float r3 = sqrt(pow(x_pos3-(x[i]-radius),2)+pow(y_pos3-(y[i]+radius),2)+pow(z_pos3-z,2));
+                float r4 = sqrt(pow(x_pos4-(x[i]+radius),2)+pow(y_pos4-(y[i]-radius),2)+pow(z_pos4-z,2));
                 
-                while(r > 0.5)
-                {       ros::spinOnce();
+                while(r1 > 0.5)
+                {       
+                        ros::spinOnce();
                         pos_pub1.publish(trajectory_msg1);
                         pos_pub2.publish(trajectory_msg2);
                         pos_pub3.publish(trajectory_msg3);
                         pos_pub4.publish(trajectory_msg4);
-                        r = sqrt(pow(x_pos1-x[i],2)+pow(y_pos1-y[i],2)+pow(z_pos1-z,2));
+
+                        r1 = sqrt(pow(x_pos1-(x[i]+radius),2)+pow(y_pos1-(y[i]+radius),2)+pow(z_pos1-z,2));
+                        r2 = sqrt(pow(x_pos2-(x[i]-radius),2)+pow(y_pos2-(y[i]-radius),2)+pow(z_pos2-z,2));
+                        r3 = sqrt(pow(x_pos3-(x[i]-radius),2)+pow(y_pos3-(y[i]+radius),2)+pow(z_pos3-z,2));
+                        r4 = sqrt(pow(x_pos4-(x[i]+radius),2)+pow(y_pos4-(y[i]-radius),2)+pow(z_pos4-z,2));
+                
                 }
         }
         looprate.sleep();
     }
-
-        
-
 
 }
