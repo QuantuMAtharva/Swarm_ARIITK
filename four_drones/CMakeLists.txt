@@ -136,31 +136,37 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(drone1 src/drone1.cpp)
-target_link_libraries(drone1
-  ${catkin_LIBRARIES}
-)
+
+
+# add_executable(drone1 src/drone1.cpp)
+# target_link_libraries(drone1
+#   ${catkin_LIBRARIES}
+# )
 
 add_executable(square src/square.cpp)
 target_link_libraries(square
   ${catkin_LIBRARIES}
 )
 
-add_executable(drone2 src/drone2.cpp)
-target_link_libraries(drone2
+# add_executable(drone2 src/drone2.cpp)
+# target_link_libraries(drone2
+#   ${catkin_LIBRARIES}
+# )
+
+# add_executable(drone3 src/drone3.cpp)
+# target_link_libraries(drone3
+#   ${catkin_LIBRARIES}
+# )
+
+# add_executable(drone4 src/drone4.cpp)
+# target_link_libraries(drone4
+#   ${catkin_LIBRARIES}
+# )
+
+add_executable(drone_repel_node src/drone_repel_node.cpp)
+target_link_libraries(drone_repel_node
   ${catkin_LIBRARIES}
 )
-
-add_executable(drone3 src/drone3.cpp)
-target_link_libraries(drone3
-  ${catkin_LIBRARIES}
-)
-
-add_executable(drone4 src/drone4.cpp)
-target_link_libraries(drone4
-  ${catkin_LIBRARIES}
-)
-
 
 
 #############

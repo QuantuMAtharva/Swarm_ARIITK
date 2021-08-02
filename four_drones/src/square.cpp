@@ -129,9 +129,9 @@ int main(int argc, char** argv){
       {       
         ros::spinOnce();
         pos_pub1.publish(trajectory_msg1);
-        pos_pub2.publish(trajectory_msg2);
-        pos_pub3.publish(trajectory_msg3);
-        pos_pub4.publish(trajectory_msg4);
+        // pos_pub2.publish(trajectory_msg2);
+        // pos_pub3.publish(trajectory_msg3);
+        // pos_pub4.publish(trajectory_msg4);
 
         r1 = sqrt(pow(x_pos1-(x[i]+radius),2)+pow(y_pos1-(y[i]+radius),2)+pow(z_pos1-z,2));
         // r2 = sqrt(pow(x_pos2-(x[i]-radius),2)+pow(y_pos2-(y[i]-radius),2)+pow(z_pos2-z,2));

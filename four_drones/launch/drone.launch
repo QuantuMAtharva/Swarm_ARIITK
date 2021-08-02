@@ -9,7 +9,7 @@
   <arg name="paused" default="false"/>
   <!-- The following line causes gzmsg and gzerr messages to be printed to the console
       (even when Gazebo is started through roslaunch) -->
-  <arg name="verbose" default="false"/>
+  <arg name="verbose" default="true"/>
 
   <env name="GAZEBO_MODEL_PATH" value="${GAZEBO_MODEL_PATH}:$(find rotors_gazebo)/models"/>
   <env name="GAZEBO_RESOURCE_PATH" value="${GAZEBO_RESOURCE_PATH}:$(find rotors_gazebo)/models"/>
@@ -56,7 +56,7 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <rosparam file="$(find four_drones)/config/params.yaml"/>
-    <node name="drone1" pkg="four_drones" type="drone1" output="screen"/>
+    <node name="drone_repel_node" pkg="four_drones" type="drone_repel_node" output="screen"/>
     <node name="square" pkg="four_drones" type="square" output="screen"/>
   </group>
 
@@ -95,8 +95,8 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <rosparam file="$(find four_drones)/config/params.yaml"/>
-    <node name="drone2" pkg="four_drones" type="drone2" output="screen"/>
-    <node name="square" pkg="four_drones" type="square" output="screen"/>
+    <node name="drone_repel_node" pkg="four_drones" type="drone_repel_node" output="screen"/>
+    <!-- <node name="square" pkg="four_drones" type="square" output="screen"/> -->
   </group>
 
   <group ns="$(arg mav_name)3">
@@ -134,8 +134,8 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <rosparam file="$(find four_drones)/config/params.yaml"/>
-    <node name="drone3" pkg="four_drones" type="drone3" output="screen"/>
-    <node name="square" pkg="four_drones" type="square" output="screen"/>
+    <node name="drone_repel_node" pkg="four_drones" type="drone_repel_node" output="screen"/>
+    <!-- <node name="square" pkg="four_drones" type="square" output="screen"/> -->
   </group>
 
   <group ns="$(arg mav_name)4">
@@ -173,8 +173,8 @@
     <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <rosparam file="$(find four_drones)/config/params.yaml"/>
-    <node name="drone4" pkg="four_drones" type="drone4" output="screen"/>
-    <node name="square" pkg="four_drones" type="square" output="screen"/>
+    <node name="drone_repel_node" pkg="four_drones" type="drone_repel_node" output="screen"/>
+    <!-- <node name="square" pkg="four_drones" type="square" output="screen"/> -->
   </group>
 
 </launch>
