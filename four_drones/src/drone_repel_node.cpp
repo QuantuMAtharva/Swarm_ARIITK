@@ -15,6 +15,9 @@ geometry_msgs::PointStamped data1,data2,data3,data4;
 
 float x_pos1,y_pos1,z_pos1,x_pos2,y_pos2,z_pos2,x_pos3,y_pos3,z_pos3,x_pos4,y_pos4,z_pos4;
 float x_vel,y_vel,z_vel;
+
+// Callbacks for getting positions of drones
+
 void subcallback1(const geometry_msgs::PointStamped::ConstPtr &msg)
 {
   data1=*msg;
@@ -75,6 +78,8 @@ int main(int argc, char** argv) {
   //     nh.advertise<trajectory_msgs::MultiDOFJointTrajectory>(
   //         mav_msgs::default_topics::COMMAND_TRAJECTORY, 10);
 
+  // Subscribe to Position of Drones
+
   ros::Subscriber pos_sub1 = nh.subscribe<geometry_msgs::PointStamped>
             ("/firefly1/ground_truth/position",100,subcallback1);
   ros::Subscriber pos_sub2 = nh.subscribe<geometry_msgs::PointStamped>
@@ -89,6 +94,8 @@ int main(int argc, char** argv) {
   // ros::Publisher cmd_vel_pub =nh.advertise<trajectory_msgs::MultiDOFJointTrajectory>
   //           ("/firefly1/command/current_reference",100);
   
+  // Publish position to /command/pose topic of each drone
+
   ros::Publisher pos_pub1 = nh.advertise<geometry_msgs::PoseStamped>
             ("/firefly1/command/pose",100);
   ros::Publisher pos_pub2 = nh.advertise<geometry_msgs::PoseStamped>
@@ -126,6 +133,8 @@ int main(int argc, char** argv) {
 
 
   // Default desired position and yaw.
+
+  // Get all the parameters from the parameter server
   float x_coord,y_coord,z_coord,yaw_des,exp_r,radius,min_dist,arm_length,rate,repel_const;
   nh.getParam("x_coord",x_coord);
   nh.getParam("y_coord",y_coord);
@@ -194,15 +203,14 @@ int main(int argc, char** argv) {
     r23= pow((pow((x_pos2-x_pos3),2)+pow((y_pos2-y_pos3),2)+pow((z_pos2-z_pos3),2)),0.5);
     r24= pow((pow((x_pos2-x_pos4),2)+pow((y_pos2-y_pos4),2)+pow((z_pos2-z_pos4),2)),0.5);
     r34= pow((pow((x_pos3-x_pos4),2)+pow((y_pos3-y_pos4),2)+pow((z_pos3-z_pos4),2)),0.5);
+    
     //ROS_INFO("R12 = %f, %f, %f",r12, r13, r14);
     //ROS_INFO("velocity of firefly 1 = %f %f %f",x_vel,y_vel,z_vel);
-
-
 
     //command drone to stop at its location in case relative distance is less than threshold
     if (r12<min_dist+arm_length||r13<min_dist+arm_length||r14<min_dist+arm_length||r23<min_dist+arm_length||r24<min_dist+arm_length||r34<min_dist+arm_length)
     {
-      // nearest drone position
+      // nearest drone position for drone 1
       if (r12<=r13 && r12<=r14)
       {
         //ROS_INFO("r12 is the smallest");
@@ -225,7 +233,7 @@ int main(int argc, char** argv) {
         z_near1=z_pos4;
       }
 
-
+      // nearest drone position for drone 2
       if (r12<=r23 && r12<=r24)
       {
         //ROS_INFO("r12 is the smallest");
@@ -248,6 +256,7 @@ int main(int argc, char** argv) {
         z_near2=z_pos4;
       }
 
+      // nearest drone position for drone 3
       if (r13<=r23 && r13<=r34)
       {
         //ROS_INFO("r12 is the smallest");
@@ -270,6 +279,7 @@ int main(int argc, char** argv) {
         z_near3=z_pos4;
       }
 
+      // nearest drone position for drone 4
       if (r14 <= r34 && r14 <= r24)
       {
         //ROS_INFO("r41 is the smallest");
@@ -292,7 +302,9 @@ int main(int argc, char** argv) {
         z_near4=z_pos3;
       }
 
-      // calculate new velocity to avoid collision
+      // calculate new position to avoid collision
+
+      // calculate and publish new position for drone 1
       del_rx1=x_pos1-x_near1;
       del_ry1=y_pos1-y_near1;
       del_rz1=z_pos1-z_near1;
@@ -302,20 +314,11 @@ int main(int argc, char** argv) {
       tar_y1 = y_pos1 + repel_const*(del_ry1/pow(mod_r1,exp_r));
       tar_z1 = z_pos1 + repel_const*(del_rz1/pow(mod_r1,exp_r));
       
-
       pose1.pose.position.x=tar_x1;
       pose1.pose.position.y=tar_y1;
       pose1.pose.position.z=tar_z1;
 
-      del_rx1=x_pos1-x_near1;
-      del_ry1=y_pos1-y_near1;
-      del_rz1=z_pos1-z_near1;
-      mod_r1=pow((pow(del_rx1,2)+pow(del_ry1,2)+pow(del_rz1,2)),0.5);
-
-      tar_x1 = x_pos1 + repel_const*(del_rx1/pow(mod_r1,exp_r));
-      tar_y1 = y_pos1 + repel_const*(del_ry1/pow(mod_r1,exp_r));
-      tar_z1 = z_pos1 + repel_const*(del_rz1/pow(mod_r1,exp_r));
-
+      // calculate and publish new position for drone 2
       del_rx2=x_pos2-x_near2;
       del_ry2=y_pos2-y_near2;
       del_rz2=z_pos2-z_near2;
@@ -325,39 +328,39 @@ int main(int argc, char** argv) {
       tar_y2 = y_pos2 + repel_const*(del_ry2/pow(mod_r2,exp_r));
       tar_z2 = z_pos2 + repel_const*(del_rz2/pow(mod_r2,exp_r));
       
-
       pose2.pose.position.x=tar_x2;
       pose2.pose.position.y=tar_y2;
       pose2.pose.position.z=tar_z2;
 
+      // calculate and publish new position for drone 3
       del_rx3=x_pos3-x_near3;
       del_ry3=y_pos3-y_near3;
       del_rz3=z_pos3-z_near3;
       mod_r3=pow((pow(del_rx3,2)+pow(del_ry3,2)+pow(del_rz3,2)),0.5);
 
       tar_x3 = x_pos3 + repel_const*(del_rx3/pow(mod_r3,exp_r));
-      tar_y3 = y_pos3+ repel_const*(del_ry3/pow(mod_r3,exp_r));
+      tar_y3 = y_pos3 + repel_const*(del_ry3/pow(mod_r3,exp_r));
       tar_z3 = z_pos3 + repel_const*(del_rz3/pow(mod_r3,exp_r));
       
-
       pose3.pose.position.x=tar_x3;
       pose3.pose.position.y=tar_y3;
       pose3.pose.position.z=tar_z3;
 
+      // calculate and publish new position for drone 4
       del_rx4=x_pos4-x_near4;
       del_ry4=y_pos4-y_near4;
       del_rz4=z_pos4-z_near4;
       mod_r4=pow((pow(del_rx4,2)+pow(del_ry4,2)+pow(del_rz4,2)),0.5);
 
       tar_x4 = x_pos4 + repel_const*(del_rx4/pow(mod_r4,exp_r));
-      tar_y4 = y_pos4+ repel_const*(del_ry4/pow(mod_r4,exp_r));
+      tar_y4 = y_pos4 + repel_const*(del_ry4/pow(mod_r4,exp_r));
       tar_z4 = z_pos4 + repel_const*(del_rz4/pow(mod_r4,exp_r));
       
-
       pose4.pose.position.x=tar_x4;
       pose4.pose.position.y=tar_y4;
       pose4.pose.position.z=tar_z4;
 
+      // publish new position
       pos_pub1.publish(pose1);
       pos_pub2.publish(pose2);
       pos_pub3.publish(pose3);
@@ -368,7 +371,7 @@ int main(int argc, char** argv) {
         looprate.sleep(); // 5/10= 0.5 sec of wait
       }
 
-      
+      // Update the drone's positions and publish them
       pose1.pose.position.x=x_coord+radius;
       pose1.pose.position.y=y_coord+radius;
       pose1.pose.position.z=z_coord;
