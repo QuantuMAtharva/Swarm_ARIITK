@@ -1,5 +1,5 @@
 x_coord: 5.0
-y_coord: 10.5
+y_coord: 10.0
 z_coord: 5.0
 yaw_des: 0.0
 radius: 0.5
@@ -8,4 +8,4 @@ arm_length: 0.53
 rate: 10.0
 exp_r: 2.0
 repel_const: 1.0
-min_dist_vel: 1.0
+min_dist_vel: 1.5

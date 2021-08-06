@@ -261,7 +261,8 @@ int main(int argc, char** argv) {
     //ROS_INFO("velocity of firefly 1 = %f %f %f",x_vel,y_vel,z_vel);
 
     //command drone to stop at its location in case relative distance is less than threshold
-    if (r12<min_dist+arm_length||r13<min_dist+arm_length||r14<min_dist+arm_length||r23<min_dist+arm_length||r24<min_dist+arm_length||r34<min_dist+arm_length)
+  
+  if (r12<min_dist_vel+arm_length||r13<min_dist_vel+arm_length||r14<min_dist_vel+arm_length||r23<min_dist_vel+arm_length||r24<min_dist_vel+arm_length||r34<min_dist_vel+arm_length)
     {
       // nearest drone position for drone 1
       if (r12<=r13 && r12<=r14)
@@ -298,6 +299,8 @@ int main(int argc, char** argv) {
         vz_near1=z_vel4;
       }
 
+
+
       // nearest drone position for drone 2
       if (r12<=r23 && r12<=r24)
       {
@@ -332,6 +335,9 @@ int main(int argc, char** argv) {
         vy_near2=y_vel4;
         vz_near2=z_vel4;
       }
+
+
+
 
       // nearest drone position for drone 3
       if (r13<=r23 && r13<=r34)
@@ -368,7 +374,9 @@ int main(int argc, char** argv) {
         vz_near3=z_vel4;
       }
 
-      // nearest drone position for drone 4
+
+
+     // nearest drone position for drone 4
       if (r14 <= r34 && r14 <= r24)
       {
         //ROS_INFO("r41 is the smallest");
@@ -403,96 +411,162 @@ int main(int argc, char** argv) {
         vz_near4=z_vel3;
       }
 
+
       // calculate new velocity to avoid collision
       del_vx1=x_vel1-vx_near1;
       del_vy1=y_vel1-vy_near1;
       del_vz1=z_vel1-vz_near1;
-
-
+      mod_v1=pow((pow(del_vx1,2)+pow(del_vy1,2)+pow(del_vz1,2)),0.5);
       // calculate new position to avoid collision
-
       // calculate and publish new position for drone 1
       del_rx1=x_pos1-x_near1;
       del_ry1=y_pos1-y_near1;
       del_rz1=z_pos1-z_near1;
       mod_r1=pow((pow(del_rx1,2)+pow(del_ry1,2)+pow(del_rz1,2)),0.5);
 
-      tar_x1 = x_pos1 + repel_const*(del_rx1/pow(mod_r1,exp_r));
-      tar_y1 = y_pos1 + repel_const*(del_ry1/pow(mod_r1,exp_r));
-      tar_z1 = z_pos1 + repel_const*(del_rz1/pow(mod_r1,exp_r));
-      
-      pose1.pose.position.x=tar_x1;
-      pose1.pose.position.y=tar_y1;
-      pose1.pose.position.z=tar_z1;
 
 
+      // relative vel for 2
       del_vx2=x_vel2-vx_near2;
       del_vy2=y_vel2-vy_near2;
       del_vz2=z_vel2-vz_near2;
-
+      mod_v2=pow((pow(del_vx2,2)+pow(del_vy2,2)+pow(del_vz2,2)),0.5);
       // calculate and publish new position for drone 2
       del_rx2=x_pos2-x_near2;
       del_ry2=y_pos2-y_near2;
       del_rz2=z_pos2-z_near2;
       mod_r2=pow((pow(del_rx2,2)+pow(del_ry2,2)+pow(del_rz2,2)),0.5);
-
-      tar_x2 = x_pos2 + repel_const*(del_rx2/pow(mod_r2,exp_r));
-      tar_y2 = y_pos2 + repel_const*(del_ry2/pow(mod_r2,exp_r));
-      tar_z2 = z_pos2 + repel_const*(del_rz2/pow(mod_r2,exp_r));
       
-      pose2.pose.position.x=tar_x2;
-      pose2.pose.position.y=tar_y2;
-      pose2.pose.position.z=tar_z2;
 
 
+      // relative vel for 3
       del_vx3=x_vel3-vx_near3;
       del_vy3=y_vel3-vy_near3;
       del_vz3=z_vel3-vz_near3;
-
+      mod_v3=pow((pow(del_vx3,2)+pow(del_vy3,2)+pow(del_vz3,2)),0.5);
       // calculate and publish new position for drone 3
       del_rx3=x_pos3-x_near3;
       del_ry3=y_pos3-y_near3;
       del_rz3=z_pos3-z_near3;
       mod_r3=pow((pow(del_rx3,2)+pow(del_ry3,2)+pow(del_rz3,2)),0.5);
 
-      tar_x3 = x_pos3 + repel_const*(del_rx3/pow(mod_r3,exp_r));
-      tar_y3 = y_pos3 + repel_const*(del_ry3/pow(mod_r3,exp_r));
-      tar_z3 = z_pos3 + repel_const*(del_rz3/pow(mod_r3,exp_r));
-      
-      pose3.pose.position.x=tar_x3;
-      pose3.pose.position.y=tar_y3;
-      pose3.pose.position.z=tar_z3;
 
 
       // calculate and publish new velocity for drone 4
       del_vx4=x_vel4-vx_near4;
       del_vy4=y_vel4-vy_near4;
       del_vz4=z_vel4-vz_near4;
-
+      mod_v4=pow((pow(del_vx4,2)+pow(del_vy4,2)+pow(del_vz4,2)),0.5);
       // calculate and publish new position for drone 4
       del_rx4=x_pos4-x_near4;
       del_ry4=y_pos4-y_near4;
       del_rz4=z_pos4-z_near4;
       mod_r4=pow((pow(del_rx4,2)+pow(del_ry4,2)+pow(del_rz4,2)),0.5);
 
-      tar_x4 = x_pos4 + repel_const*(del_rx4/pow(mod_r4,exp_r));
-      tar_y4 = y_pos4 + repel_const*(del_ry4/pow(mod_r4,exp_r));
-      tar_z4 = z_pos4 + repel_const*(del_rz4/pow(mod_r4,exp_r));
-      
-      pose4.pose.position.x=tar_x4;
-      pose4.pose.position.y=tar_y4;
-      pose4.pose.position.z=tar_z4;
 
-      // publish new position
-      pos_pub1.publish(pose1);
-      pos_pub2.publish(pose2);
-      pos_pub3.publish(pose3);
-      pos_pub4.publish(pose4);
+      if (r12<min_dist+arm_length||r13<min_dist+arm_length||r14<min_dist+arm_length||r23<min_dist+arm_length||r24<min_dist+arm_length||r34<min_dist+arm_length)
+      {
+        tar_x1 = x_pos1 + repel_const*(del_rx1/pow(mod_r1,exp_r));
+        tar_y1 = y_pos1 + repel_const*(del_ry1/pow(mod_r1,exp_r));
+        tar_z1 = z_pos1 + repel_const*(del_rz1/pow(mod_r1,exp_r));        
+        pose1.pose.position.x=tar_x1;
+        pose1.pose.position.y=tar_y1;
+        pose1.pose.position.z=tar_z1;
 
-      for(int i=0;i<5;i++){
-        ros::spinOnce();
-        looprate.sleep(); // 5/10= 0.5 sec of wait
+
+        tar_x2 = x_pos2 + repel_const*(del_rx2/pow(mod_r2,exp_r));
+        tar_y2 = y_pos2 + repel_const*(del_ry2/pow(mod_r2,exp_r));
+        tar_z2 = z_pos2 + repel_const*(del_rz2/pow(mod_r2,exp_r));        
+        pose2.pose.position.x=tar_x2;
+        pose2.pose.position.y=tar_y2;
+        pose2.pose.position.z=tar_z2;
+
+
+        tar_x3 = x_pos3 + repel_const*(del_rx3/pow(mod_r3,exp_r));
+        tar_y3 = y_pos3 + repel_const*(del_ry3/pow(mod_r3,exp_r));
+        tar_z3 = z_pos3 + repel_const*(del_rz3/pow(mod_r3,exp_r));        
+        pose3.pose.position.x=tar_x3;
+        pose3.pose.position.y=tar_y3;
+        pose3.pose.position.z=tar_z3;
+
+        tar_x4 = x_pos4 + repel_const*(del_rx4/pow(mod_r4,exp_r));
+        tar_y4 = y_pos4 + repel_const*(del_ry4/pow(mod_r4,exp_r));
+        tar_z4 = z_pos4 + repel_const*(del_rz4/pow(mod_r4,exp_r));
+        
+        pose4.pose.position.x=tar_x4;
+        pose4.pose.position.y=tar_y4;
+        pose4.pose.position.z=tar_z4;
+
+        // publish new position
+        pos_pub1.publish(pose1);
+        pos_pub2.publish(pose2);
+        pos_pub3.publish(pose3);
+        pos_pub4.publish(pose4);
+
+        for(int i=0;i<5;i++)
+        {
+          ros::spinOnce();
+          looprate.sleep(); // 5/10= 0.5 sec of wait
+        }
+
       }
+
+      else
+      {
+        // tar_x1 = x_pos1 + repel_const*(del_rx1/pow(mod_r1,exp_r));        
+        // tar_y1 = y_pos1 + repel_const*(del_ry1/pow(mod_r1,exp_r));
+        tar_x1 = x_pos1 + mod_v1*(del_vy1);
+        tar_y1 = y_pos1 + mod_v1*(del_vx1);
+        // tar_z1 = z_pos1 + repel_const*(del_rz1/pow(mod_r1,exp_r));        
+        pose1.pose.position.x=tar_x1;
+        pose1.pose.position.y=tar_y1;
+        pose1.pose.position.z=z_pos1;
+
+
+        // tar_x2 = x_pos2 + repel_const*(del_rx2/pow(mod_r2,exp_r));
+        // tar_y2 = y_pos2 + repel_const*(del_ry2/pow(mod_r2,exp_r));
+        tar_x2 = x_pos2 + mod_v2*(del_vy2);
+        tar_y2 = y_pos2 + mod_v2*(del_vx2);
+        // tar_z2 = z_pos2 + repel_const*(del_rz2/pow(mod_r2,exp_r));        
+        pose2.pose.position.x=tar_x2;
+        pose2.pose.position.y=tar_y2;
+        pose2.pose.position.z=z_pos2;
+
+
+        // tar_x3 = x_pos3 + repel_const*(del_rx3/pow(mod_r3,exp_r));
+        // tar_y3 = y_pos3 + repel_const*(del_ry3/pow(mod_r3,exp_r));
+        tar_x3 = x_pos3 + mod_v3*(del_vy3);
+        tar_y3 = y_pos3 + mod_v3*(del_vx3);
+        // tar_z3 = z_pos3 + repel_const*(del_rz3/pow(mod_r3,exp_r));        
+        pose3.pose.position.x=tar_x3;
+        pose3.pose.position.y=tar_y3;
+        pose3.pose.position.z=z_pos3;
+
+        
+        // tar_x4 = x_pos4 + repel_const*(del_rx4/pow(mod_r4,exp_r));
+        // tar_y4 = y_pos4 + repel_const*(del_ry4/pow(mod_r4,exp_r));
+        tar_x4 = x_pos4 + mod_v4*(del_vy4);
+        tar_y4 = y_pos4 + mod_v4*(del_vx4);
+        // tar_z4 = z_pos4 + repel_const*(del_rz4/pow(mod_r4,exp_r));
+        
+        pose4.pose.position.x=tar_x4;
+        pose4.pose.position.y=tar_y4;
+        pose4.pose.position.z=z_pos4;
+
+        // publish new position
+        pos_pub1.publish(pose1);
+        pos_pub2.publish(pose2);
+        pos_pub3.publish(pose3);
+        pos_pub4.publish(pose4);
+
+        for(int i=0;i<5;i++)
+        {
+          ros::spinOnce();
+          looprate.sleep(); // 5/10= 0.5 sec of wait
+        }
+      }
+
+
 
       // Update the drone's positions and publish them
       pose1.pose.position.x=x_coord+radius;
@@ -516,7 +590,6 @@ int main(int argc, char** argv) {
       pos_pub3.publish(pose3);
       pos_pub4.publish(pose4);
     }
-
     
 
     //ROS_INFO("position of firefly 1= %f %f %f",x_pos1,y_pos1,z_pos1);
