@@ -503,7 +503,7 @@ int main(int argc, char** argv) {
         pos_pub3.publish(pose3);
         pos_pub4.publish(pose4);
 
-        for(int i=0;i<0;i++)
+        for(int i=0;i<5;i++)
         {
           ros::spinOnce();
           looprate.sleep(); // 5/10= 0.5 sec of wait
