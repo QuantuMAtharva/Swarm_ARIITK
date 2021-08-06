@@ -503,7 +503,7 @@ int main(int argc, char** argv) {
         pos_pub3.publish(pose3);
         pos_pub4.publish(pose4);
 
-        for(int i=0;i<5;i++)
+        for(int i=0;i<0;i++)
         {
           ros::spinOnce();
           looprate.sleep(); // 5/10= 0.5 sec of wait
@@ -515,8 +515,8 @@ int main(int argc, char** argv) {
       {
         // tar_x1 = x_pos1 + repel_const*(del_rx1/pow(mod_r1,exp_r));        
         // tar_y1 = y_pos1 + repel_const*(del_ry1/pow(mod_r1,exp_r));
-        tar_x1 = x_pos1 + mod_v1*(del_vy1);
-        tar_y1 = y_pos1 + mod_v1*(del_vx1);
+        tar_x1 = x_pos1 + 100*mod_v1*(del_vy1);
+        tar_y1 = y_pos1 + 100*mod_v1*(del_vx1);
         // tar_z1 = z_pos1 + repel_const*(del_rz1/pow(mod_r1,exp_r));        
         pose1.pose.position.x=tar_x1;
         pose1.pose.position.y=tar_y1;
@@ -525,8 +525,8 @@ int main(int argc, char** argv) {
 
         // tar_x2 = x_pos2 + repel_const*(del_rx2/pow(mod_r2,exp_r));
         // tar_y2 = y_pos2 + repel_const*(del_ry2/pow(mod_r2,exp_r));
-        tar_x2 = x_pos2 + mod_v2*(del_vy2);
-        tar_y2 = y_pos2 + mod_v2*(del_vx2);
+        tar_x2 = x_pos2 + 100*mod_v2*(del_vy2);
+        tar_y2 = y_pos2 + 100*mod_v2*(del_vx2);
         // tar_z2 = z_pos2 + repel_const*(del_rz2/pow(mod_r2,exp_r));        
         pose2.pose.position.x=tar_x2;
         pose2.pose.position.y=tar_y2;
@@ -535,8 +535,8 @@ int main(int argc, char** argv) {
 
         // tar_x3 = x_pos3 + repel_const*(del_rx3/pow(mod_r3,exp_r));
         // tar_y3 = y_pos3 + repel_const*(del_ry3/pow(mod_r3,exp_r));
-        tar_x3 = x_pos3 + mod_v3*(del_vy3);
-        tar_y3 = y_pos3 + mod_v3*(del_vx3);
+        tar_x3 = x_pos3 + 100*mod_v3*(del_vy3);
+        tar_y3 = y_pos3 + 100*mod_v3*(del_vx3);
         // tar_z3 = z_pos3 + repel_const*(del_rz3/pow(mod_r3,exp_r));        
         pose3.pose.position.x=tar_x3;
         pose3.pose.position.y=tar_y3;
@@ -545,8 +545,8 @@ int main(int argc, char** argv) {
         
         // tar_x4 = x_pos4 + repel_const*(del_rx4/pow(mod_r4,exp_r));
         // tar_y4 = y_pos4 + repel_const*(del_ry4/pow(mod_r4,exp_r));
-        tar_x4 = x_pos4 + mod_v4*(del_vy4);
-        tar_y4 = y_pos4 + mod_v4*(del_vx4);
+        tar_x4 = x_pos4 + 100*mod_v4*(del_vy4);
+        tar_y4 = y_pos4 + 100*mod_v4*(del_vx4);
         // tar_z4 = z_pos4 + repel_const*(del_rz4/pow(mod_r4,exp_r));
         
         pose4.pose.position.x=tar_x4;
@@ -601,5 +601,3 @@ int main(int argc, char** argv) {
 
   return 0;
 }
-
-
