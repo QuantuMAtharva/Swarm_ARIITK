@@ -7,14 +7,15 @@
 #include <ros/ros.h>
 #include <std_srvs/Empty.h>
 #include <trajectory_msgs/MultiDOFJointTrajectory.h>
+#include <mav_disturbance_observer/ObserverState.h>
 #include <cmath>
 
 geometry_msgs::PointStamped data1,data2,data3,data4;
 // nav_msgs::Odometry data5;
-// mav_disturbance_observer::ObserverState data5;
+mav_disturbance_observer::ObserverState data5;
 
 float x_pos1,y_pos1,z_pos1,x_pos2,y_pos2,z_pos2,x_pos3,y_pos3,z_pos3,x_pos4,y_pos4,z_pos4;
-float x_vel,y_vel,z_vel;
+float x_vel1,y_vel1,z_vel1,x_vel2,y_vel2,z_vel2,x_vel3,y_vel3,z_vel3,x_vel4,y_vel4,z_vel4;
 
 // Callbacks for getting positions of drones
 
@@ -54,18 +55,55 @@ void subcallback4(const geometry_msgs::PointStamped::ConstPtr &msg)
   //ROS_INFO("position of firefly 4 ( from  function)= %f %f %f",x_pos4,y_pos4,z_pos4);
   return;
 }
-// void sub_odom_callback(const mav_disturbance_observer::ObserverState::ConstPtr &msg)
-// {
-//   data5=*msg;
-//   x_vel=data5.velocity[0];
-//   y_vel=data5.velocity[1];
-//   z_vel=data5.velocity[2];
-//   // x_vel=data5.twist.twist.linear.x;
-//   // y_vel=data5.twist.twist.linear.y;
-//   // z_vel=data5.twist.twist.linear.z;
-//   //ROS_INFO("velocity of firefly 1 (from  function)= %f %f %f",x_vel,y_vel,z_vel);
-//   return;
-// }
+void sub_odom_callback1(const mav_disturbance_observer::ObserverState::ConstPtr &msg)
+{
+  data5=*msg;
+  x_vel1=data5.velocity[0];
+  y_vel1=data5.velocity[1];
+  z_vel1=data5.velocity[2];
+  // x_vel=data5.twist.twist.linear.x;
+  // y_vel=data5.twist.twist.linear.y;
+  // z_vel=data5.twist.twist.linear.z;
+  //ROS_INFO("velocity of firefly 1 (from  function)= %f %f %f",x_vel,y_vel,z_vel);
+  return;
+}
+void sub_odom_callback2(const mav_disturbance_observer::ObserverState::ConstPtr &msg)
+{
+  data5=*msg;
+  x_vel2=data5.velocity[0];
+  y_vel2=data5.velocity[1];
+  z_vel2=data5.velocity[2];
+  // x_vel=data5.twist.twist.linear.x;
+  // y_vel=data5.twist.twist.linear.y;
+  // z_vel=data5.twist.twist.linear.z;
+  // ROS_INFO("velocity of firefly 2 (from  function)= %f %f %f",x_vel,y_vel,z_vel);
+  return;
+}
+void sub_odom_callback3(const mav_disturbance_observer::ObserverState::ConstPtr &msg)
+{
+  data5=*msg;
+  x_vel3=data5.velocity[0];
+  y_vel3=data5.velocity[1];
+  z_vel3=data5.velocity[2];
+  // x_vel=data5.twist.twist.linear.x;
+  // y_vel=data5.twist.twist.linear.y;
+  // z_vel=data5.twist.twist.linear.z;
+  //ROS_INFO("velocity of firefly 3 (from  function)= %f %f %f",x_vel,y_vel,z_vel);
+  return;
+}
+void sub_odom_callback4(const mav_disturbance_observer::ObserverState::ConstPtr &msg)
+{
+  data5=*msg;
+  x_vel4=data5.velocity[0];
+  y_vel4=data5.velocity[1];
+  z_vel4=data5.velocity[2];
+  // x_vel=data5.twist.twist.linear.x;
+  // y_vel=data5.twist.twist.linear.y;
+  // z_vel=data5.twist.twist.linear.z;
+  //ROS_INFO("velocity of firefly 4 (from  function)= %f %f %f",x_vel,y_vel,z_vel);
+  return;
+}
+
 
 
 int main(int argc, char** argv) {
@@ -88,6 +126,16 @@ int main(int argc, char** argv) {
             ("/firefly3/ground_truth/position",100,subcallback3);
   ros::Subscriber pos_sub4 = nh.subscribe<geometry_msgs::PointStamped>
             ("/firefly4/ground_truth/position",100,subcallback4);
+
+  ros::Subscriber vel_sub1 = nh.subscribe<mav_disturbance_observer::ObserverState>
+            ("/firefly1/mav_linear_mpc/KF_observer/observer_state",100,sub_odom_callback1);
+  ros::Subscriber vel_sub2 = nh.subscribe<mav_disturbance_observer::ObserverState>
+            ("/firefly2/mav_linear_mpc/KF_observer/observer_state",100,sub_odom_callback2);
+  ros::Subscriber vel_sub3 = nh.subscribe<mav_disturbance_observer::ObserverState>
+            ("/firefly3/mav_linear_mpc/KF_observer/observer_state",100,sub_odom_callback3);
+  ros::Subscriber vel_sub4 = nh.subscribe<mav_disturbance_observer::ObserverState>
+            ("/firefly4/mav_linear_mpc/KF_observer/observer_state",100,sub_odom_callback4);
+ 
   
   // ros::Subscriber pos_sub5 = nh.subscribe<mav_disturbance_observer::ObserverState>
   //           ("/firefly1/mav_linear_mpc/KF_observer/observer_state",100,sub_odom_callback);
@@ -135,7 +183,7 @@ int main(int argc, char** argv) {
   // Default desired position and yaw.
 
   // Get all the parameters from the parameter server
-  float x_coord,y_coord,z_coord,yaw_des,exp_r,radius,min_dist,arm_length,rate,repel_const;
+  float x_coord,y_coord,z_coord,yaw_des,exp_r,radius,min_dist,arm_length,rate,repel_const,min_dist_vel;
   nh.getParam("x_coord",x_coord);
   nh.getParam("y_coord",y_coord);
   nh.getParam("z_coord",z_coord);
@@ -146,6 +194,8 @@ int main(int argc, char** argv) {
   nh.getParam("min_dist", min_dist);
   nh.getParam("arm_length", arm_length);
   nh.getParam("repel_const", repel_const);
+  nh.getParam("min_dis_vel", min_dist_vel);
+
 
   // Eigen::Vector3d desired_position(x_coord+radius, y_coord+radius, z_coord);
   // double desired_yaw = yaw_des;
@@ -189,6 +239,9 @@ int main(int argc, char** argv) {
   float x_near1,y_near1,z_near1,x_near2,y_near2,z_near2,x_near3,y_near3,z_near3,x_near4,y_near4,z_near4;
   float tar_x1,tar_y1,tar_z1,tar_x2,tar_y2,tar_z2,tar_x3,tar_y3,tar_z3,tar_x4,tar_y4,tar_z4;
   float del_rx1,del_ry1,del_rz1,del_rx2,del_ry2,del_rz2,del_rx3,del_ry3,del_rz3,del_rx4,del_ry4,del_rz4,mod_r1,mod_r2,mod_r3,mod_r4;
+  float del_vx1,del_vy1,del_vz1,del_vx2,del_vy2,del_vz2,del_vx3,del_vy3,del_vz3,del_vx4,del_vy4,del_vz4,mod_v1,mod_v2,mod_v3,mod_v4;
+  float vx_near1,vy_near1,vz_near1,vx_near2,vy_near2,vz_near2,vx_near3,vy_near3,vz_near3,vx_near4,vy_near4,vz_near4;
+
 
   geometry_msgs::PoseStamped pose1,pose2,pose3,pose4;
 
@@ -217,6 +270,10 @@ int main(int argc, char** argv) {
         x_near1=x_pos2;
         y_near1=y_pos2;
         z_near1=z_pos2;
+
+        vx_near1=x_vel2;
+        vy_near1=y_vel2;
+        vz_near1=z_vel2;
       }    
       else if (r13 <= r12 && r13 <= r14)
       {
@@ -224,6 +281,10 @@ int main(int argc, char** argv) {
         x_near1=x_pos3;
         y_near1=y_pos3;
         z_near1=z_pos3;
+
+        vx_near1=x_vel3;
+        vy_near1=y_vel3;
+        vz_near1=z_vel3;
       }
       else
       {
@@ -231,6 +292,10 @@ int main(int argc, char** argv) {
         x_near1=x_pos4;
         y_near1=y_pos4;
         z_near1=z_pos4;
+
+        vx_near1=x_vel4;
+        vy_near1=y_vel4;
+        vz_near1=z_vel4;
       }
 
       // nearest drone position for drone 2
@@ -240,6 +305,10 @@ int main(int argc, char** argv) {
         x_near2=x_pos1;
         y_near2=y_pos1;
         z_near2=z_pos1;
+
+        vx_near2=x_vel1;
+        vy_near2=y_vel1;
+        vz_near2=z_vel1;
       }    
       else if (r23 <= r12 && r23 <= r24)
       {
@@ -247,6 +316,10 @@ int main(int argc, char** argv) {
         x_near2=x_pos3;
         y_near2=y_pos3;
         z_near2=z_pos3;
+
+        vx_near2=x_vel3;
+        vy_near2=y_vel3;
+        vz_near2=z_vel3;
       }
       else
       {
@@ -254,6 +327,10 @@ int main(int argc, char** argv) {
         x_near2=x_pos4;
         y_near2=y_pos4;
         z_near2=z_pos4;
+
+        vx_near2=x_vel4;
+        vy_near2=y_vel4;
+        vz_near2=z_vel4;
       }
 
       // nearest drone position for drone 3
@@ -263,6 +340,10 @@ int main(int argc, char** argv) {
         x_near3=x_pos1;
         y_near3=y_pos1;
         z_near3=z_pos1;
+
+        vx_near3=x_vel1;
+        vy_near3=y_vel1;
+        vz_near3=z_vel1;
       }    
       else if (r23 <= r13 && r23 <= r34)
       {
@@ -270,6 +351,10 @@ int main(int argc, char** argv) {
         x_near3=x_pos2;
         y_near3=y_pos2;
         z_near3=z_pos2;
+
+        vx_near3=x_vel2;
+        vy_near3=y_vel2;
+        vz_near3=z_vel2;
       }
       else
       {
@@ -277,6 +362,10 @@ int main(int argc, char** argv) {
         x_near3=x_pos4;
         y_near3=y_pos4;
         z_near3=z_pos4;
+
+        vx_near3=x_vel4;
+        vy_near3=y_vel4;
+        vz_near3=z_vel4;
       }
 
       // nearest drone position for drone 4
@@ -286,6 +375,10 @@ int main(int argc, char** argv) {
         x_near4=x_pos1;
         y_near4=y_pos1;
         z_near4=z_pos1;
+
+        vx_near4=x_vel1;
+        vy_near4=y_vel1;
+        vz_near4=z_vel1;
       }    
       else if (r24 <= r14 && r24 <= r34)
       {
@@ -293,6 +386,10 @@ int main(int argc, char** argv) {
         x_near4=x_pos2;
         y_near4=y_pos2;
         z_near4=z_pos2;
+
+        vx_near4=x_vel2;
+        vy_near4=y_vel2;
+        vz_near4=z_vel2;
       }
       else
       {
@@ -300,7 +397,17 @@ int main(int argc, char** argv) {
         x_near4=x_pos3;
         y_near4=y_pos3;
         z_near4=z_pos3;
+
+        vx_near4=x_vel3;
+        vy_near4=y_vel3;
+        vz_near4=z_vel3;
       }
+
+      // calculate new velocity to avoid collision
+      del_vx1=x_vel1-vx_near1;
+      del_vy1=y_vel1-vy_near1;
+      del_vz1=z_vel1-vz_near1;
+
 
       // calculate new position to avoid collision
 
@@ -318,6 +425,11 @@ int main(int argc, char** argv) {
       pose1.pose.position.y=tar_y1;
       pose1.pose.position.z=tar_z1;
 
+
+      del_vx2=x_vel2-vx_near2;
+      del_vy2=y_vel2-vy_near2;
+      del_vz2=z_vel2-vz_near2;
+
       // calculate and publish new position for drone 2
       del_rx2=x_pos2-x_near2;
       del_ry2=y_pos2-y_near2;
@@ -332,6 +444,11 @@ int main(int argc, char** argv) {
       pose2.pose.position.y=tar_y2;
       pose2.pose.position.z=tar_z2;
 
+
+      del_vx3=x_vel3-vx_near3;
+      del_vy3=y_vel3-vy_near3;
+      del_vz3=z_vel3-vz_near3;
+
       // calculate and publish new position for drone 3
       del_rx3=x_pos3-x_near3;
       del_ry3=y_pos3-y_near3;
@@ -345,6 +462,12 @@ int main(int argc, char** argv) {
       pose3.pose.position.x=tar_x3;
       pose3.pose.position.y=tar_y3;
       pose3.pose.position.z=tar_z3;
+
+
+      // calculate and publish new velocity for drone 4
+      del_vx4=x_vel4-vx_near4;
+      del_vy4=y_vel4-vy_near4;
+      del_vz4=z_vel4-vz_near4;
 
       // calculate and publish new position for drone 4
       del_rx4=x_pos4-x_near4;
