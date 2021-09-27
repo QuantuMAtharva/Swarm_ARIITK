@@ -9,6 +9,7 @@
 #include <trajectory_msgs/MultiDOFJointTrajectory.h>
 #include <mav_disturbance_observer/ObserverState.h>
 #include <cmath>
+#include <algorithm>
 
 geometry_msgs::PointStamped data1,data2,data3,data4;
 // nav_msgs::Odometry data5;
@@ -177,7 +178,7 @@ int main(int argc, char** argv) {
 
 
   // Get params  -----------------------------------------------------------------------------------------------
-  float x_coord,y_coord,z_coord,yaw_des,exp_r,radius,min_dist,arm_length,rate,repel_const,min_dist_vel;
+  float x_coord,y_coord,z_coord,yaw_des,exp_r,radius,min_dist,arm_length,rate,repel_const,min_dist_vel,vel_repel_const;
   nh.getParam("x_coord",x_coord);
   nh.getParam("y_coord",y_coord);
   nh.getParam("z_coord",z_coord);
@@ -189,6 +190,7 @@ int main(int argc, char** argv) {
   nh.getParam("arm_length", arm_length);
   nh.getParam("repel_const", repel_const);
   nh.getParam("min_dis_vel", min_dist_vel);
+  nh.getParam("vel_repel_const", vel_repel_const);
 
 
   // Eigen::Vector3d desired_position(x_coord+radius, y_coord+radius, z_coord);
@@ -215,7 +217,7 @@ int main(int argc, char** argv) {
   trajectory_msg.pose.position.x=x_coord+radius;
   trajectory_msg.pose.position.y=y_coord-+radius;
   trajectory_msg.pose.position.z=z_coord;
-  // pos_pub1.publish(trajectory_msg);
+  pos_pub1.publish(trajectory_msg);
   
   trajectory_msg.pose.position.x=x_coord-radius;
   trajectory_msg.pose.position.y=y_coord-radius;
@@ -230,7 +232,7 @@ int main(int argc, char** argv) {
   trajectory_msg.pose.position.x=x_coord+radius;
   trajectory_msg.pose.position.y=y_coord-radius;
   trajectory_msg.pose.position.z=z_coord;
-  pos_pub4.publish(trajectory_msg);
+  // pos_pub4.publish(trajectory_msg);
 
   ros::spinOnce();
 
@@ -478,9 +480,113 @@ int main(int argc, char** argv) {
       mod_r4=pow((pow(del_rx4,2)+pow(del_ry4,2)+pow(del_rz4,2)),0.5);
 
 
+      // Calculation for middle region -------------------------------------------------------------------------------------------
+
+      vector<float> d;
+      d.push_back(r12);
+      d.push_back(r13);
+      d.push_back(r14);
+      // d.push_back(r23);
+      // d.push_back(r24);
+      // d.push_back(r34);
+
+      int max_index = max_element(d.begin(),d.end())-d.begin();
+      float outdrone_x,outdrone_y,outdrone_z,outdrone_vx,outdrone_vy,outdrone_vz;
+
+      if(max_index==0)
+      {
+        outdrone_x=x_pos2;
+        outdrone_y=y_pos2;
+        outdrone_z=z_pos2;
+        outdrone_vx=x_vel2;
+        outdrone_vy=y_vel2;
+        outdrone_vz=z_vel2;
+      }
+      else if(max_index==1)
+      {
+        outdrone_x=x_pos3;
+        outdrone_y=y_pos3;
+        outdrone_z=z_pos3;
+        outdrone_vx=x_vel3;
+        outdrone_vy=y_vel3;
+        outdrone_vz=z_vel3;
+      }
+      else if(max_index==2)
+      {
+        outdrone_x=x_pos4;
+        outdrone_y=y_pos4;
+        outdrone_z=z_pos4;
+        outdrone_vx=x_vel4;
+        outdrone_vy=y_vel4;
+        outdrone_vz=z_vel4;
+      }
+
       // Condition for inner loop ------------------------------------------------------------------------------
 
-      if (r12<min_dist+arm_length||r13<min_dist+arm_length||r14<min_dist+arm_length||r23<min_dist+arm_length||r24<min_dist+arm_length||r34<min_dist+arm_length)
+      if (r12>min_dist+arm_length||r13>min_dist+arm_length||r14>min_dist+arm_length||r23>min_dist+arm_length||r24>min_dist+arm_length||r34>min_dist+arm_length)
+      {
+        // tar_x1 = x_pos1 + repel_const*(del_rx1/pow(mod_r1,exp_r));        
+        // tar_y1 = y_pos1 + repel_const*(del_ry1/pow(mod_r1,exp_r));
+        // tar_x1 = x_pos1 - 100*mod_v1*(del_vy1);
+        // tar_y1 = y_pos1 - 100*mod_v1*(del_vx1);
+        // tar_z1 = z_pos1 + repel_const*(del_rz1/pow(mod_r1,exp_r));
+        float del_vel1= pow((pow((x_vel1-outdrone_vx),2)+ pow((x_vel1-outdrone_vx),2) + pow((x_vel1-outdrone_vx),2)),0.5);
+        tar_z1 = z_pos1 + vel_repel_const*(del_vel1); 
+        pose1.pose.position.x=x_pos1;
+        pose1.pose.position.y=y_pos1;
+        pose1.pose.position.z=tar_z1;
+
+
+        // tar_x2 = x_pos2 + repel_const*(del_rx2/pow(mod_r2,exp_r));
+        // tar_y2 = y_pos2 + repel_const*(del_ry2/pow(mod_r2,exp_r));
+        // tar_x2 = x_pos2 - 100*mod_v2*(del_vy2);
+        // tar_y2 = y_pos2 - 100*mod_v2*(del_vx2);
+        // tar_z2 = z_pos2 + repel_const*(del_rz2/pow(mod_r2,exp_r));
+        float del_vel2= pow((pow((x_vel2-outdrone_vx),2)+ pow((x_vel2-outdrone_vx),2) + pow((x_vel3-outdrone_vx),2)),0.5);
+        tar_z2 = z_pos2 + vel_repel_const*(del_vel2); 
+        pose2.pose.position.x=x_pos2;
+        pose2.pose.position.y=y_pos2;
+        pose2.pose.position.z=tar_z2;
+
+
+        // tar_x3 = x_pos3 + repel_const*(del_rx3/pow(mod_r3,exp_r));
+        // tar_y3 = y_pos3 + repel_const*(del_ry3/pow(mod_r3,exp_r));
+        // tar_x3 = x_pos3 - 100*mod_v3*(del_vy3);
+        // tar_y3 = y_pos3 - 100*mod_v3*(del_vx3);
+        // tar_z3 = z_pos3 + repel_const*(del_rz3/pow(mod_r3,exp_r));
+        float del_vel3= pow((pow((x_vel3-outdrone_vx),2)+ pow((x_vel3-outdrone_vx),2) + pow((x_vel3-outdrone_vx),2)),0.5);
+        tar_z3 = z_pos3 + vel_repel_const*(del_vel3);   
+        pose3.pose.position.x=x_pos3;
+        pose3.pose.position.y=y_pos3;
+        pose3.pose.position.z=tar_z3;
+
+        
+        // tar_x4 = x_pos4 + repel_const*(del_rx4/pow(mod_r4,exp_r));
+        // tar_y4 = y_pos4 + repel_const*(del_ry4/pow(mod_r4,exp_r));
+        // tar_x4 = x_pos4 - 100*mod_v4*(del_vy4);
+        // tar_y4 = y_pos4 - 100*mod_v4*(del_vx4);
+        // tar_z4 = z_pos4 + repel_const*(del_rz4/pow(mod_r4,exp_r));
+        float del_vel4= pow((pow((x_vel4-outdrone_vx),2)+ pow((x_vel4-outdrone_vx),2) + pow((x_vel4-outdrone_vx),2)),0.5);
+        tar_z4 = z_pos4 + vel_repel_const*(del_vel4); 
+        pose4.pose.position.x=x_pos4;
+        pose4.pose.position.y=y_pos4;
+        pose4.pose.position.z=tar_z4;
+
+        // publish new position
+        pos_pub1.publish(pose1);
+        pos_pub2.publish(pose2);
+        pos_pub3.publish(pose3);
+        pos_pub4.publish(pose4);
+
+        for(int i=0;i<5;i++)
+        {
+          ros::spinOnce();
+          looprate.sleep(); // 5/10= 0.5 sec of wait
+        }
+
+      }
+    // Condition for middle region ---------------------------------------------------------------------------------
+      else
       {
         tar_x1 = x_pos1 + repel_const*(del_rx1/pow(mod_r1,exp_r));
         tar_y1 = y_pos1 + repel_const*(del_ry1/pow(mod_r1,exp_r));
@@ -524,62 +630,7 @@ int main(int argc, char** argv) {
           ros::spinOnce();
           looprate.sleep(); // 5/10= 0.5 sec of wait
         }
-
-      }
-    // Condition for middle region ---------------------------------------------------------------------------------
-      else
-      {
-        // tar_x1 = x_pos1 + repel_const*(del_rx1/pow(mod_r1,exp_r));        
-        // tar_y1 = y_pos1 + repel_const*(del_ry1/pow(mod_r1,exp_r));
-        tar_x1 = x_pos1 - 100*mod_v1*(del_vy1);
-        tar_y1 = y_pos1 - 100*mod_v1*(del_vx1);
-        // tar_z1 = z_pos1 + repel_const*(del_rz1/pow(mod_r1,exp_r));        
-        pose1.pose.position.x=tar_x1;
-        pose1.pose.position.y=tar_y1;
-        pose1.pose.position.z=z_pos1;
-
-
-        // tar_x2 = x_pos2 + repel_const*(del_rx2/pow(mod_r2,exp_r));
-        // tar_y2 = y_pos2 + repel_const*(del_ry2/pow(mod_r2,exp_r));
-        tar_x2 = x_pos2 - 100*mod_v2*(del_vy2);
-        tar_y2 = y_pos2 - 100*mod_v2*(del_vx2);
-        // tar_z2 = z_pos2 + repel_const*(del_rz2/pow(mod_r2,exp_r));        
-        pose2.pose.position.x=tar_x2;
-        pose2.pose.position.y=tar_y2;
-        pose2.pose.position.z=z_pos2;
-
-
-        // tar_x3 = x_pos3 + repel_const*(del_rx3/pow(mod_r3,exp_r));
-        // tar_y3 = y_pos3 + repel_const*(del_ry3/pow(mod_r3,exp_r));
-        tar_x3 = x_pos3 - 100*mod_v3*(del_vy3);
-        tar_y3 = y_pos3 - 100*mod_v3*(del_vx3);
-        // tar_z3 = z_pos3 + repel_const*(del_rz3/pow(mod_r3,exp_r));        
-        pose3.pose.position.x=tar_x3;
-        pose3.pose.position.y=tar_y3;
-        pose3.pose.position.z=z_pos3;
-
         
-        // tar_x4 = x_pos4 + repel_const*(del_rx4/pow(mod_r4,exp_r));
-        // tar_y4 = y_pos4 + repel_const*(del_ry4/pow(mod_r4,exp_r));
-        tar_x4 = x_pos4 - 100*mod_v4*(del_vy4);
-        tar_y4 = y_pos4 - 100*mod_v4*(del_vx4);
-        // tar_z4 = z_pos4 + repel_const*(del_rz4/pow(mod_r4,exp_r));
-        
-        pose4.pose.position.x=tar_x4;
-        pose4.pose.position.y=tar_y4;
-        pose4.pose.position.z=z_pos4;
-
-        // publish new position
-        pos_pub1.publish(pose1);
-        pos_pub2.publish(pose2);
-        pos_pub3.publish(pose3);
-        pos_pub4.publish(pose4);
-
-        for(int i=0;i<5;i++)
-        {
-          ros::spinOnce();
-          looprate.sleep(); // 5/10= 0.5 sec of wait
-        }
       }
 
 

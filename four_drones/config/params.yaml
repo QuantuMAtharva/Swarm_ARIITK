@@ -8,4 +8,5 @@ arm_length: 0.53
 rate: 10.0
 exp_r: 2.0
 repel_const: 1.0
+vel_repel_const: 10
 min_dist_vel: 1.5
