@@ -491,7 +491,7 @@ int main(int argc, char** argv) {
       // d.push_back(r34);
 
       int max_index = max_element(d.begin(),d.end())-d.begin();
-      ROS_INFO("%d huehue", max_index);
+      ROS_INFO("%d huehue", max_index+2);
       float outdrone_x,outdrone_y,outdrone_z,outdrone_vx,outdrone_vy,outdrone_vz;
 
       if(max_index==0)
@@ -524,7 +524,7 @@ int main(int argc, char** argv) {
 
       // Condition for middle region ------------------------------------------------------------------------------
 
-      if (r12>min_dist+arm_length||r13>min_dist+arm_length||r14>min_dist+arm_length||r23>min_dist+arm_length||r24>min_dist+arm_length||r34>min_dist+arm_length)
+      if (r12>min_dist+arm_length || r13>min_dist+arm_length || r14>min_dist+arm_length)
       {
         ROS_INFO("check hello");
 
@@ -538,7 +538,7 @@ int main(int argc, char** argv) {
 
         if (del_r1<1) del_r1 = 1;
 
-        tar_z1 = z_pos1 + vel_repel_const*(del_vel1/del_r1);
+        tar_z1 = z_pos1 + vel_repel_const*del_vel1/del_r1;
         pose1.pose.position.x=x_pos1;
         pose1.pose.position.y=y_pos1;
         pose1.pose.position.z=tar_z1;
@@ -554,7 +554,7 @@ int main(int argc, char** argv) {
 
         if (del_r2<1) del_r2 = 1;
 
-        tar_z2 = z_pos2 + vel_repel_const*(del_vel2/del_r2); 
+        tar_z2 = z_pos2 + vel_repel_const*del_vel2/del_r2; 
         pose2.pose.position.x=x_pos2;
         pose2.pose.position.y=y_pos2;
         pose2.pose.position.z=tar_z2;
@@ -570,7 +570,7 @@ int main(int argc, char** argv) {
 
         if (del_r3<1) del_r3 = 1;
 
-        tar_z3 = z_pos3 + vel_repel_const*(del_vel3/del_r3);   
+        tar_z3 = z_pos3 + vel_repel_const*del_vel3/del_r3;   
         pose3.pose.position.x=x_pos3;
         pose3.pose.position.y=y_pos3;
         pose3.pose.position.z=tar_z3;
@@ -586,7 +586,7 @@ int main(int argc, char** argv) {
 
         if (del_r4<1) del_r4 = 1;
 
-        tar_z4 = z_pos4 + vel_repel_const*(del_vel4/del_r4);
+        tar_z4 = z_pos4 + vel_repel_const*del_vel4/del_r4;
         
         pose4.pose.position.x=x_pos4;
         pose4.pose.position.y=y_pos4;
@@ -606,7 +606,7 @@ int main(int argc, char** argv) {
 
       }
     // Condition for inner region ---------------------------------------------------------------------------------
-      if (r12<min_dist+arm_length||r13<min_dist+arm_length||r14<min_dist+arm_length||r23<min_dist+arm_length||r24<min_dist+arm_length||r34<min_dist+arm_length)
+      if (r12<min_dist+arm_length || r13<min_dist+arm_length || r14<min_dist+arm_length || r23<min_dist+arm_length || r24<min_dist+arm_length || r34<min_dist+arm_length)
       {
         ROS_INFO("andha paisa");
 
