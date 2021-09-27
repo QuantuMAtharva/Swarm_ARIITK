@@ -3,10 +3,11 @@ y_coord: 10.0
 z_coord: 5.0
 yaw_des: 0.0
 radius: 0.5
-min_dist: 0.4
+# min_dist: 0.4
+min_dist: 0.8 # Done for testing out outer region repulsion
 arm_length: 0.53
 rate: 10.0
 exp_r: 2.0
 repel_const: 1.0
-vel_repel_const: 10
-min_dist_vel: 1.5
+vel_repel_const: 1.0
+min_dist_vel: 5.0

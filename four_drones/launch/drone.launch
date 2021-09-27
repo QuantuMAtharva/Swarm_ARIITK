@@ -141,7 +141,7 @@
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <rosparam file="$(find four_drones)/config/params.yaml"/>
     <node name="drone_repel_node" pkg="four_drones" type="drone_repel_node" output="screen"/>
-    <!-- <node name="square" pkg="four_drones" type="square" output="screen"/> -->
+    <node name="square" pkg="four_drones" type="square" output="screen"/>
   </group>
 
   <group ns="$(arg mav_name)4">
@@ -181,7 +181,7 @@
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" />
     <rosparam file="$(find four_drones)/config/params.yaml"/>
     <node name="drone_repel_node" pkg="four_drones" type="drone_repel_node" output="screen"/>
-    <node name="square" pkg="four_drones" type="square" output="screen"/>
+    <!-- <node name="square" pkg="four_drones" type="square" output="screen"/> -->
   </group>
 
 </launch>
