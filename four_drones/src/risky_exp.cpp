@@ -240,10 +240,19 @@ int main(int argc, char** argv) {
   
   float r12,r13,r14,r23,r24,r34;
   float x_near1,y_near1,z_near1,x_near2,y_near2,z_near2,x_near3,y_near3,z_near3,x_near4,y_near4,z_near4;
-  float tar_x1,tar_y1,tar_z1,tar_x2,tar_y2,tar_z2,tar_x3,tar_y3,tar_z3,tar_x4,tar_y4,tar_z4;
-  float del_rx1,del_ry1,del_rz1,del_rx2,del_ry2,del_rz2,del_rx3,del_ry3,del_rz3,del_rx4,del_ry4,del_rz4,mod_r1,mod_r2,mod_r3,mod_r4;
-  float del_vx1,del_vy1,del_vz1,del_vx2,del_vy2,del_vz2,del_vx3,del_vy3,del_vz3,del_vx4,del_vy4,del_vz4,mod_v1,mod_v2,mod_v3,mod_v4;
+  float x_near1b,y_near1b,z_near1b,x_near2b,y_near2b,z_near2b,x_near3b,y_near3b,z_near3b,x_near4b,y_near4b,z_near4b;
+  
   float vx_near1,vy_near1,vz_near1,vx_near2,vy_near2,vz_near2,vx_near3,vy_near3,vz_near3,vx_near4,vy_near4,vz_near4;
+  float vx_near1b, vy_near1b, vz_near1b, vx_near2b, vy_near2b, vz_near2b, vx_near3b, vy_near3b, vz_near3b, vx_near4b, vy_near4b, vz_near4b;
+  
+  float del_rx1b, del_ry1b, del_rz1b, del_rx2b, del_ry2b, del_rz2b, del_rx3b, del_ry3b, del_rz3b, del_rx4b, del_ry4b, del_rz4b;
+
+  float tar_x1,tar_y1,tar_z1,tar_x2,tar_y2,tar_z2,tar_x3,tar_y3,tar_z3,tar_x4,tar_y4,tar_z4;
+  
+  float del_rx1,del_ry1,del_rz1,del_rx2,del_ry2,del_rz2,del_rx3,del_ry3,del_rz3,del_rx4,del_ry4,del_rz4,mod_r1,mod_r2,mod_r3,mod_r4;
+  
+  float del_vx1,del_vy1,del_vz1,del_vx2,del_vy2,del_vz2,del_vx3,del_vy3,del_vz3,del_vx4,del_vy4,del_vz4,mod_v1,mod_v2,mod_v3,mod_v4;
+  float del_vx1b, del_vy1b, del_vz1b, del_vx2b, del_vy2b, del_vz2b, del_vx3b, del_vy3b, del_vz3b, del_vx4b, del_vy4b, del_vz4b;
   
   geometry_msgs::PoseStamped pose1,pose2,pose3,pose4;
 
@@ -266,7 +275,6 @@ int main(int argc, char** argv) {
     {
       
       // nearest drone, their relative velocities and relative distances ----------------------------------------------------
-      
       // nearest drone position for drone 1
       if (r12<=r13 && r12<=r14)
       {
