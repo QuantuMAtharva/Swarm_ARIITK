@@ -489,19 +489,15 @@ int main(int argc, char** argv) {
 
       int max_index = max_element(d.begin(),d.end())-d.begin();
 
-      ROS_INFO("r12:%f r13:%f r14:%f", r12, r13, r14);
-      ROS_INFO("chala ja");
-      ROS_INFO("max_index %f", d[max_index]);
+      // ROS_INFO("r12:%f r13:%f r14:%f", r12, r13, r14);
+      // ROS_INFO("chala ja");
+      // ROS_INFO("max_index %f", d[max_index]);
 
       // int key=1;
       // if(d[max_index]<min_dist+arm_length)key=0;
       // else key=1;
 
       float outdrone_x,outdrone_y,outdrone_z,outdrone_vx,outdrone_vy,outdrone_vz;
-
-  
-      
-        ROS_INFO("imposter drone = %d", max_index+2);
         
 
         if(max_index==0)
@@ -539,7 +535,8 @@ int main(int argc, char** argv) {
       // if (r12>min_dist+arm_length || r13>min_dist+arm_length || r14>min_dist+arm_length)
       if (d[max_index]>min_dist+arm_length)
       {
-        ROS_INFO("middle region");
+        ROS_INFO("middle region");        
+        ROS_INFO("imposter drone = %d", max_index+2);
 
         // tar_x1 = x_pos1 + repel_const*(del_rx1/pow(mod_r1,exp_r));        
         // tar_y1 = y_pos1 + repel_const*(del_ry1/pow(mod_r1,exp_r));
