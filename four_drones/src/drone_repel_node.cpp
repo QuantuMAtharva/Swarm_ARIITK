@@ -490,8 +490,8 @@ int main(int argc, char** argv) {
       else d.push_back(r14);
 
       int max_index = max_element(d.begin(),d.end())-d.begin();
-      int key=1;
 
+      int key=1;
       if(d[max_index]<min_dist+arm_length)key=0;
       else key=1;
 
@@ -543,7 +543,7 @@ int main(int argc, char** argv) {
           // tar_z1 = z_pos1 + repel_const*(del_rz1/pow(mod_r1,exp_r));
           float del_vel1= pow((pow((x_vel1-outdrone_vx),2)+ pow((y_vel1-outdrone_vy),2) + pow((z_vel1-outdrone_vz),2)),0.5);
           float del_r1 = pow((pow((x_pos1-outdrone_x),2)+ pow((y_pos1-outdrone_y),2) + pow((z_pos1-outdrone_z),2)),1);
-
+          ROS_INFO(" del_r1 from imposter = %f",del_r1);
           if (del_r1<1) del_r1 = 1;
 
           tar_z1 = z_pos1 + vel_repel_const*del_vel1/del_r1;
