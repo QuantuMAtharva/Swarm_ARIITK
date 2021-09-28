@@ -107,7 +107,7 @@ void sub_odom_callback4(const mav_disturbance_observer::ObserverState::ConstPtr 
 
 
 int main(int argc, char** argv) {
-  ros::init(argc, argv, "drone1");
+  ros::init(argc, argv, "drone_repel_node");
   ros::NodeHandle nh;
   ros::NodeHandle nh_private("~");
 
@@ -185,7 +185,7 @@ int main(int argc, char** argv) {
   nh.getParam("min_dist", min_dist);
   nh.getParam("arm_length", arm_length);
   nh.getParam("repel_const", repel_const);
-  nh.getParam("min_dis_vel", min_dist_vel);
+  nh.getParam("min_dist_vel", min_dist_vel);
   nh.getParam("vel_repel_const", vel_repel_const);
 
 
@@ -258,7 +258,6 @@ int main(int argc, char** argv) {
   while(ros::ok())
   {
     ros::spinOnce();
-
     // calculate realtive distance of drones -------------------------------------------------------------------------------
 
     r12= pow((pow((x_pos1-x_pos2),2)+pow((y_pos1-y_pos2),2)+pow((z_pos1-z_pos2),2)),0.5);
@@ -268,10 +267,9 @@ int main(int argc, char** argv) {
     r24= pow((pow((x_pos2-x_pos4),2)+pow((y_pos2-y_pos4),2)+pow((z_pos2-z_pos4),2)),0.5);
     r34= pow((pow((x_pos3-x_pos4),2)+pow((y_pos3-y_pos4),2)+pow((z_pos3-z_pos4),2)),0.5);
 
-  
-  if (r12<min_dist_vel+arm_length||r13<min_dist_vel+arm_length||r14<min_dist_vel+arm_length||r23<min_dist_vel+arm_length||r24<min_dist_vel+arm_length||r34<min_dist_vel+arm_length)
+
+  if (r12<(min_dist_vel+arm_length) || r13<(min_dist_vel+arm_length) || r14<(min_dist_vel+arm_length) || r23<(min_dist_vel+arm_length) || r24<(min_dist_vel+arm_length) || r34<(min_dist_vel+arm_length))
     {
-      
       // nearest drone, their relative velocities and relative distances ----------------------------------------------------
       // nearest drone position for drone 1
       if (r12<=r13 && r12<=r14)
@@ -491,14 +489,18 @@ int main(int argc, char** argv) {
 
       int max_index = max_element(d.begin(),d.end())-d.begin();
 
-      int key=1;
-      if(d[max_index]<min_dist+arm_length)key=0;
-      else key=1;
+      ROS_INFO("r12:%f r13:%f r14:%f", r12, r13, r14);
+      ROS_INFO("chala ja");
+      ROS_INFO("max_index %f", d[max_index]);
+
+      // int key=1;
+      // if(d[max_index]<min_dist+arm_length)key=0;
+      // else key=1;
 
       float outdrone_x,outdrone_y,outdrone_z,outdrone_vx,outdrone_vy,outdrone_vz;
 
-      if(key==1)
-      {
+  
+      
         ROS_INFO("imposter drone = %d", max_index+2);
         
 
@@ -529,91 +531,94 @@ int main(int argc, char** argv) {
           outdrone_vy=y_vel4;
           outdrone_vz=z_vel4;
         }
+        else;
 
-        // Condition for middle region ------------------------------------------------------------------------------
 
-        if (r12>min_dist+arm_length || r13>min_dist+arm_length || r14>min_dist+arm_length)
+      // Condition for middle region ------------------------------------------------------------------------------
+
+      // if (r12>min_dist+arm_length || r13>min_dist+arm_length || r14>min_dist+arm_length)
+      if (d[max_index]>min_dist+arm_length)
+      {
+        ROS_INFO("middle region");
+
+        // tar_x1 = x_pos1 + repel_const*(del_rx1/pow(mod_r1,exp_r));        
+        // tar_y1 = y_pos1 + repel_const*(del_ry1/pow(mod_r1,exp_r));
+        // tar_x1 = x_pos1 - 100*mod_v1*(del_vy1);
+        // tar_y1 = y_pos1 - 100*mod_v1*(del_vx1);
+        // tar_z1 = z_pos1 + repel_const*(del_rz1/pow(mod_r1,exp_r));
+        float del_vel1= pow((pow((x_vel1-outdrone_vx),2)+ pow((y_vel1-outdrone_vy),2) + pow((z_vel1-outdrone_vz),2)),0.5);
+        float del_r1 = pow((pow((x_pos1-outdrone_x),2)+ pow((y_pos1-outdrone_y),2) + pow((z_pos1-outdrone_z),2)),1);
+        ROS_INFO("del_r1 from imposter = %f",del_r1);
+        if (del_r1<1) del_r1 = 1;
+
+        tar_z1 = z_pos1 + vel_repel_const*del_vel1/del_r1;
+        pose1.pose.position.x=x_pos1;
+        pose1.pose.position.y=y_pos1;
+        pose1.pose.position.z=tar_z1;
+
+
+        // tar_x2 = x_pos2 + repel_const*(del_rx2/pow(mod_r2,exp_r));
+        // tar_y2 = y_pos2 + repel_const*(del_ry2/pow(mod_r2,exp_r));
+        // tar_x2 = x_pos2 - 100*mod_v2*(del_vy2);
+        // tar_y2 = y_pos2 - 100*mod_v2*(del_vx2);
+        // tar_z2 = z_pos2 + repel_const*(del_rz2/pow(mod_r2,exp_r));
+        float del_vel2= pow((pow((x_vel2-outdrone_vx),2)+ pow((y_vel2-outdrone_vy),2) + pow((z_vel3-outdrone_vz),2)),0.5);
+        float del_r2 = pow((pow((x_pos2-outdrone_x),2)+ pow((y_pos2-outdrone_y),2) + pow((z_pos2-outdrone_z),2)),0.5);
+
+        if (del_r2<1) del_r2 = 1;
+
+        tar_z2 = z_pos2 + vel_repel_const*del_vel2/del_r2; 
+        pose2.pose.position.x=x_pos2;
+        pose2.pose.position.y=y_pos2;
+        pose2.pose.position.z=tar_z2;
+
+
+        // tar_x3 = x_pos3 + repel_const*(del_rx3/pow(mod_r3,exp_r));
+        // tar_y3 = y_pos3 + repel_const*(del_ry3/pow(mod_r3,exp_r));
+        // tar_x3 = x_pos3 - 100*mod_v3*(del_vy3);
+        // tar_y3 = y_pos3 - 100*mod_v3*(del_vx3);
+        // tar_z3 = z_pos3 + repel_const*(del_rz3/pow(mod_r3,exp_r));
+        float del_vel3= pow((pow((x_vel3-outdrone_vx),2)+ pow((y_vel3-outdrone_vy),2) + pow((z_vel3-outdrone_vz),2)),0.5);
+        float del_r3 = pow((pow((x_pos3-outdrone_x),2)+ pow((y_pos3-outdrone_y),2) + pow((z_pos3-outdrone_z),2)),0.5);
+
+        if (del_r3<1) del_r3 = 1;
+
+        tar_z3 = z_pos3 + vel_repel_const*del_vel3/del_r3;   
+        pose3.pose.position.x=x_pos3;
+        pose3.pose.position.y=y_pos3;
+        pose3.pose.position.z=tar_z3;
+
+        
+        // tar_x4 = x_pos4 + repel_const*(del_rx4/pow(mod_r4,exp_r));
+        // tar_y4 = y_pos4 + repel_const*(del_ry4/pow(mod_r4,exp_r));
+        // tar_x4 = x_pos4 - 100*mod_v4*(del_vy4);
+        // tar_y4 = y_pos4 - 100*mod_v4*(del_vx4);
+        // tar_z4 = z_pos4 + repel_const*(del_rz4/pow(mod_r4,exp_r));
+        float del_vel4= pow((pow((x_vel4-outdrone_vx),2)+ pow((y_vel4-outdrone_vy),2) + pow((z_vel4-outdrone_vz),2)),0.5);
+        float del_r4 = pow((pow((x_pos4-outdrone_x),2)+ pow((y_pos4-outdrone_y),2) + pow((z_pos4-outdrone_z),2)),0.5);
+
+        if (del_r4<1) del_r4 = 1;
+
+        tar_z4 = z_pos4 + vel_repel_const*del_vel4/del_r4;
+        
+        pose4.pose.position.x=x_pos4;
+        pose4.pose.position.y=y_pos4;
+        pose4.pose.position.z=tar_z4;
+
+        // publish new position
+        pos_pub1.publish(pose1);
+        pos_pub2.publish(pose2);
+        pos_pub3.publish(pose3);
+        pos_pub4.publish(pose4);
+
+        for(int i=0;i<5;i++)
         {
-          ROS_INFO("middle region");
-
-          // tar_x1 = x_pos1 + repel_const*(del_rx1/pow(mod_r1,exp_r));        
-          // tar_y1 = y_pos1 + repel_const*(del_ry1/pow(mod_r1,exp_r));
-          // tar_x1 = x_pos1 - 100*mod_v1*(del_vy1);
-          // tar_y1 = y_pos1 - 100*mod_v1*(del_vx1);
-          // tar_z1 = z_pos1 + repel_const*(del_rz1/pow(mod_r1,exp_r));
-          float del_vel1= pow((pow((x_vel1-outdrone_vx),2)+ pow((y_vel1-outdrone_vy),2) + pow((z_vel1-outdrone_vz),2)),0.5);
-          float del_r1 = pow((pow((x_pos1-outdrone_x),2)+ pow((y_pos1-outdrone_y),2) + pow((z_pos1-outdrone_z),2)),1);
-          ROS_INFO(" del_r1 from imposter = %f",del_r1);
-          if (del_r1<1) del_r1 = 1;
-
-          tar_z1 = z_pos1 + vel_repel_const*del_vel1/del_r1;
-          pose1.pose.position.x=x_pos1;
-          pose1.pose.position.y=y_pos1;
-          pose1.pose.position.z=tar_z1;
-
-
-          // tar_x2 = x_pos2 + repel_const*(del_rx2/pow(mod_r2,exp_r));
-          // tar_y2 = y_pos2 + repel_const*(del_ry2/pow(mod_r2,exp_r));
-          // tar_x2 = x_pos2 - 100*mod_v2*(del_vy2);
-          // tar_y2 = y_pos2 - 100*mod_v2*(del_vx2);
-          // tar_z2 = z_pos2 + repel_const*(del_rz2/pow(mod_r2,exp_r));
-          float del_vel2= pow((pow((x_vel2-outdrone_vx),2)+ pow((y_vel2-outdrone_vy),2) + pow((z_vel3-outdrone_vz),2)),0.5);
-          float del_r2 = pow((pow((x_pos2-outdrone_x),2)+ pow((y_pos2-outdrone_y),2) + pow((z_pos2-outdrone_z),2)),0.5);
-
-          if (del_r2<1) del_r2 = 1;
-
-          tar_z2 = z_pos2 + vel_repel_const*del_vel2/del_r2; 
-          pose2.pose.position.x=x_pos2;
-          pose2.pose.position.y=y_pos2;
-          pose2.pose.position.z=tar_z2;
-
-
-          // tar_x3 = x_pos3 + repel_const*(del_rx3/pow(mod_r3,exp_r));
-          // tar_y3 = y_pos3 + repel_const*(del_ry3/pow(mod_r3,exp_r));
-          // tar_x3 = x_pos3 - 100*mod_v3*(del_vy3);
-          // tar_y3 = y_pos3 - 100*mod_v3*(del_vx3);
-          // tar_z3 = z_pos3 + repel_const*(del_rz3/pow(mod_r3,exp_r));
-          float del_vel3= pow((pow((x_vel3-outdrone_vx),2)+ pow((y_vel3-outdrone_vy),2) + pow((z_vel3-outdrone_vz),2)),0.5);
-          float del_r3 = pow((pow((x_pos3-outdrone_x),2)+ pow((y_pos3-outdrone_y),2) + pow((z_pos3-outdrone_z),2)),0.5);
-
-          if (del_r3<1) del_r3 = 1;
-
-          tar_z3 = z_pos3 + vel_repel_const*del_vel3/del_r3;   
-          pose3.pose.position.x=x_pos3;
-          pose3.pose.position.y=y_pos3;
-          pose3.pose.position.z=tar_z3;
-
-          
-          // tar_x4 = x_pos4 + repel_const*(del_rx4/pow(mod_r4,exp_r));
-          // tar_y4 = y_pos4 + repel_const*(del_ry4/pow(mod_r4,exp_r));
-          // tar_x4 = x_pos4 - 100*mod_v4*(del_vy4);
-          // tar_y4 = y_pos4 - 100*mod_v4*(del_vx4);
-          // tar_z4 = z_pos4 + repel_const*(del_rz4/pow(mod_r4,exp_r));
-          float del_vel4= pow((pow((x_vel4-outdrone_vx),2)+ pow((y_vel4-outdrone_vy),2) + pow((z_vel4-outdrone_vz),2)),0.5);
-          float del_r4 = pow((pow((x_pos4-outdrone_x),2)+ pow((y_pos4-outdrone_y),2) + pow((z_pos4-outdrone_z),2)),0.5);
-
-          if (del_r4<1) del_r4 = 1;
-
-          tar_z4 = z_pos4 + vel_repel_const*del_vel4/del_r4;
-          
-          pose4.pose.position.x=x_pos4;
-          pose4.pose.position.y=y_pos4;
-          pose4.pose.position.z=tar_z4;
-
-          // publish new position
-          pos_pub1.publish(pose1);
-          pos_pub2.publish(pose2);
-          pos_pub3.publish(pose3);
-          pos_pub4.publish(pose4);
-
-          for(int i=0;i<5;i++)
-          {
-            ros::spinOnce();
-            looprate.sleep(); // 5/10= 0.5 sec of wait
-          }
-
+          ros::spinOnce();
+          looprate.sleep(); // 5/10= 0.5 sec of wait
         }
+
       }
+
     // Condition for inner region ---------------------------------------------------------------------------------
       if (r12<min_dist+arm_length || r13<min_dist+arm_length || r14<min_dist+arm_length || r23<min_dist+arm_length || r24<min_dist+arm_length || r34<min_dist+arm_length)
       {
