@@ -533,7 +533,7 @@ int main(int argc, char** argv) {
       // Condition for middle region ------------------------------------------------------------------------------
 
       // if (r12>min_dist+arm_length || r13>min_dist+arm_length || r14>min_dist+arm_length)
-      if (d[max_index]>min_dist+arm_length)
+      if (d[max_index]>radius*2*1.732 + 0.3)
       {
         ROS_INFO("middle region");        
         ROS_INFO("imposter drone = %d", max_index+2);
