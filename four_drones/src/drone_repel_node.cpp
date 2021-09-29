@@ -543,12 +543,14 @@ int main(int argc, char** argv) {
         // tar_x1 = x_pos1 - 100*mod_v1*(del_vy1);
         // tar_y1 = y_pos1 - 100*mod_v1*(del_vx1);
         // tar_z1 = z_pos1 + repel_const*(del_rz1/pow(mod_r1,exp_r));
-        float del_vel1= pow((pow((x_vel1-outdrone_vx),2)+ pow((y_vel1-outdrone_vy),2) + pow((z_vel1-outdrone_vz),2)),0.5);
-        float del_r1 = pow((pow((x_pos1-outdrone_x),2)+ pow((y_pos1-outdrone_y),2) + pow((z_pos1-outdrone_z),2)),1);
+        // float del_vel1= pow((pow((x_vel1-outdrone_vx),2)+ pow((y_vel1-outdrone_vy),2) + pow((z_vel1-outdrone_vz),2)),0.5);
+        float app_v1 = (x_vel1*outdrone_vx + y_vel1*outdrone_vy + z_vel1*outdrone_vz)/(pow((pow(x_vel1,2)+ pow(y_vel1,2) + pow(z_vel1,2)),0.5));
+        float del_r1 = pow((pow((x_pos1-outdrone_x),2)+ pow((y_pos1-outdrone_y),2) + pow((z_pos1-outdrone_z),2)),0.5);
         ROS_INFO("del_r1 from imposter = %f",del_r1);
         if (del_r1<1) del_r1 = 1;
+        if (app_v1<0) app_v1 = 0;
 
-        tar_z1 = z_pos1 + vel_repel_const*del_vel1/del_r1;
+        tar_z1 = z_pos1 + vel_repel_const*app_v1/del_r1;
         pose1.pose.position.x=x_pos1;
         pose1.pose.position.y=y_pos1;
         pose1.pose.position.z=tar_z1;
@@ -559,12 +561,14 @@ int main(int argc, char** argv) {
         // tar_x2 = x_pos2 - 100*mod_v2*(del_vy2);
         // tar_y2 = y_pos2 - 100*mod_v2*(del_vx2);
         // tar_z2 = z_pos2 + repel_const*(del_rz2/pow(mod_r2,exp_r));
-        float del_vel2= pow((pow((x_vel2-outdrone_vx),2)+ pow((y_vel2-outdrone_vy),2) + pow((z_vel3-outdrone_vz),2)),0.5);
+        // float del_vel2= pow((pow((x_vel2-outdrone_vx),2)+ pow((y_vel2-outdrone_vy),2) + pow((z_vel3-outdrone_vz),2)),0.5);
+        float app_v2 = (x_vel2*outdrone_vx + y_vel2*outdrone_vy + z_vel2*outdrone_vz)/(pow((pow(x_vel2,2)+ pow(y_vel2,2) + pow(z_vel2,2)),0.5));
         float del_r2 = pow((pow((x_pos2-outdrone_x),2)+ pow((y_pos2-outdrone_y),2) + pow((z_pos2-outdrone_z),2)),0.5);
 
         if (del_r2<1) del_r2 = 1;
+        if (app_v2<0) app_v2 = 0;
 
-        tar_z2 = z_pos2 + vel_repel_const*del_vel2/del_r2; 
+        tar_z2 = z_pos2 + vel_repel_const*app_v2/del_r2; 
         pose2.pose.position.x=x_pos2;
         pose2.pose.position.y=y_pos2;
         pose2.pose.position.z=tar_z2;
@@ -575,12 +579,14 @@ int main(int argc, char** argv) {
         // tar_x3 = x_pos3 - 100*mod_v3*(del_vy3);
         // tar_y3 = y_pos3 - 100*mod_v3*(del_vx3);
         // tar_z3 = z_pos3 + repel_const*(del_rz3/pow(mod_r3,exp_r));
-        float del_vel3= pow((pow((x_vel3-outdrone_vx),2)+ pow((y_vel3-outdrone_vy),2) + pow((z_vel3-outdrone_vz),2)),0.5);
+        // float del_vel3= pow((pow((x_vel3-outdrone_vx),2)+ pow((y_vel3-outdrone_vy),2) + pow((z_vel3-outdrone_vz),2)),0.5);
+        float app_v3 = (x_vel3*outdrone_vx + y_vel3*outdrone_vy + z_vel3*outdrone_vz)/(pow((pow(x_vel3,2)+ pow(y_vel3,2) + pow(z_vel3,2)),0.5));
         float del_r3 = pow((pow((x_pos3-outdrone_x),2)+ pow((y_pos3-outdrone_y),2) + pow((z_pos3-outdrone_z),2)),0.5);
 
         if (del_r3<1) del_r3 = 1;
+        if (app_v3<0) app_v3 = 0;
 
-        tar_z3 = z_pos3 + vel_repel_const*del_vel3/del_r3;   
+        tar_z3 = z_pos3 + vel_repel_const*app_v3/del_r3;   
         pose3.pose.position.x=x_pos3;
         pose3.pose.position.y=y_pos3;
         pose3.pose.position.z=tar_z3;
@@ -591,12 +597,14 @@ int main(int argc, char** argv) {
         // tar_x4 = x_pos4 - 100*mod_v4*(del_vy4);
         // tar_y4 = y_pos4 - 100*mod_v4*(del_vx4);
         // tar_z4 = z_pos4 + repel_const*(del_rz4/pow(mod_r4,exp_r));
-        float del_vel4= pow((pow((x_vel4-outdrone_vx),2)+ pow((y_vel4-outdrone_vy),2) + pow((z_vel4-outdrone_vz),2)),0.5);
+        // float del_vel4= pow((pow((x_vel4-outdrone_vx),2)+ pow((y_vel4-outdrone_vy),2) + pow((z_vel4-outdrone_vz),2)),0.5);
+        float app_v4 = (x_vel4*outdrone_vx + y_vel4*outdrone_vy + z_vel4*outdrone_vz)/(pow((pow(x_vel4,2)+ pow(y_vel4,2) + pow(z_vel4,2)),0.5));
         float del_r4 = pow((pow((x_pos4-outdrone_x),2)+ pow((y_pos4-outdrone_y),2) + pow((z_pos4-outdrone_z),2)),0.5);
 
         if (del_r4<1) del_r4 = 1;
+        if (app_v4<0) app_v4 = 0;
 
-        tar_z4 = z_pos4 + vel_repel_const*del_vel4/del_r4;
+        tar_z4 = z_pos4 + vel_repel_const*app_v4/del_r4;
         
         pose4.pose.position.x=x_pos4;
         pose4.pose.position.y=y_pos4;
@@ -608,7 +616,7 @@ int main(int argc, char** argv) {
         pos_pub3.publish(pose3);
         pos_pub4.publish(pose4);
 
-        for(int i=0;i<5;i++)
+        for(int i=0;i<3;i++)
         {
           ros::spinOnce();
           looprate.sleep(); // 5/10= 0.5 sec of wait
@@ -658,7 +666,7 @@ int main(int argc, char** argv) {
         pos_pub3.publish(pose3);
         pos_pub4.publish(pose4);
 
-        for(int i=0;i<5;i++)
+        for(int i=0;i<3;i++)
         {
           ros::spinOnce();
           looprate.sleep(); // 5/10= 0.5 sec of wait
