@@ -118,7 +118,7 @@ float app_vel(std::vector<float>vec_pos1,std::vector<float>vec_outdrone_pos,std:
   vel1 = std::inner_product(vec_vel1.begin(), vec_vel1.end(), vec_del_pos.begin(), 0.0)/(pow(pow(vec_del_pos[0],2)+pow(vec_del_pos[1],2)+pow(vec_del_pos[2],2),0.5));
   vel2 = std::inner_product(vec_outdrone_vel.begin(), vec_outdrone_vel.end(), vec_del_pos.begin(), 0.0)/(pow(pow(vec_del_pos[0],2)+pow(vec_del_pos[1],2)+pow(vec_del_pos[2],2),0.5));
   
-  if(vel1-vel2<0)
+  if(vel1-vel2>0)
   return(0);
 
   return vel1-vel2;
@@ -559,7 +559,7 @@ int main(int argc, char** argv) {
         std::vector<float> vec_vel4 {x_vel4,y_vel4,z_vel4};
       // Condition for middle region -----------------------------------------------------------------------------
       // if (r12>min_dist+arm_length || r13>min_dist+arm_length || r14>min_dist+arm_length)
-      if (d[max_index]>radius*2*1.732 + 0.7)
+      if (d[max_index]>radius*2*1.732 + 2)
       {
         ROS_INFO("middle region");        
         ROS_INFO("imposter drone = %d", max_index+2);
@@ -575,8 +575,9 @@ int main(int argc, char** argv) {
         ROS_INFO("del_r1 from imposter = %f",del_r1);
         if (del_r1<1) del_r1 = 1;
 
-        tar_z1 = z_pos1 + vel_repel_const*app_v1/del_r1;
+        tar_z1 = z_pos1 - vel_repel_const*app_v1/del_r1;
         ROS_INFO("tar_z for 1 = %f",tar_z1);
+        ROS_INFO("app vel = %f",app_v1);
         pose1.pose.position.x=x_pos1;
         pose1.pose.position.y=y_pos1;
         pose1.pose.position.z=tar_z1;
@@ -592,7 +593,7 @@ int main(int argc, char** argv) {
 
         if (del_r2<1) del_r2 = 1;
 
-        tar_z2 = z_pos2 + vel_repel_const*app_v2/del_r2; 
+        tar_z2 = z_pos2 - vel_repel_const*app_v2/del_r2; 
         pose2.pose.position.x=x_pos2;
         pose2.pose.position.y=y_pos2;
         pose2.pose.position.z=tar_z2;
@@ -608,7 +609,7 @@ int main(int argc, char** argv) {
 
         if (del_r3<1) del_r3 = 1;
 
-        tar_z3 = z_pos3 + vel_repel_const*app_v3/del_r3;   
+        tar_z3 = z_pos3 - vel_repel_const*app_v3/del_r3;   
         pose3.pose.position.x=x_pos3;
         pose3.pose.position.y=y_pos3;
         pose3.pose.position.z=tar_z3;
@@ -624,7 +625,7 @@ int main(int argc, char** argv) {
 
         if (del_r4<1) del_r4 = 1;
 
-        tar_z4 = z_pos4 + vel_repel_const*app_v4/del_r4;
+        tar_z4 = z_pos4 - vel_repel_const*app_v4/del_r4;
         
         pose4.pose.position.x=x_pos4;
         pose4.pose.position.y=y_pos4;
@@ -636,7 +637,7 @@ int main(int argc, char** argv) {
         pos_pub3.publish(pose3);
         pos_pub4.publish(pose4);
 
-        for(int i=0;i<3;i++)
+        for(int i=0;i<5;i++)
         {
           ros::spinOnce();
           looprate.sleep(); // 5/10= 0.5 sec of wait
