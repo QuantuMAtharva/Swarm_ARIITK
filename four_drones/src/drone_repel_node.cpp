@@ -559,7 +559,7 @@ int main(int argc, char** argv) {
         std::vector<float> vec_vel4 {x_vel4,y_vel4,z_vel4};
       // Condition for middle region -----------------------------------------------------------------------------
       // if (r12>min_dist+arm_length || r13>min_dist+arm_length || r14>min_dist+arm_length)
-      if (d[max_index]>radius*2*1.732 + 2)
+      if (d[max_index]>radius*2*1.732 + 1.5)
       {
         ROS_INFO("middle region");        
         ROS_INFO("imposter drone = %d", max_index+2);
@@ -637,7 +637,7 @@ int main(int argc, char** argv) {
         pos_pub3.publish(pose3);
         pos_pub4.publish(pose4);
 
-        for(int i=0;i<5;i++)
+        for(int i=0;i<3;i++)
         {
           ros::spinOnce();
           looprate.sleep(); // 5/10= 0.5 sec of wait
