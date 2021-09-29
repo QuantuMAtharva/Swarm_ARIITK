@@ -10,6 +10,7 @@
 #include <mav_disturbance_observer/ObserverState.h>
 #include <cmath>
 #include <algorithm>
+#include <numeric>
 
 geometry_msgs::PointStamped data1,data2,data3,data4;
 // nav_msgs::Odometry data5;
@@ -103,6 +104,24 @@ void sub_odom_callback4(const mav_disturbance_observer::ObserverState::ConstPtr 
   // z_vel=data5.twist.twist.linear.z;
   //ROS_INFO("velocity of firefly 4 (from  function)= %f %f %f",x_vel,y_vel,z_vel);
   return;
+}
+
+float app_vel(std::vector<float>vec_pos1,std::vector<float>vec_outdrone_pos,std::vector<float>vec_vel1,std::vector<float>vec_outdrone_vel)
+{
+  float vel1,vel2;
+  std::vector<float> vec_del_pos {vec_pos1[0]-vec_outdrone_pos[0] , vec_pos1[1]-vec_outdrone_pos[1] , vec_pos1[2]-vec_outdrone_pos[2]};
+  if(vec_del_pos[0]<0.1 && vec_del_pos[1]<0.1 && vec_del_pos[2]<0.1)
+  {
+    vec_del_pos[0]=0.1;vec_del_pos[1]=0.1;vec_del_pos[2]=0.1;
+  }
+
+  vel1 = std::inner_product(vec_vel1.begin(), vec_vel1.end(), vec_del_pos.begin(), 0.0)/(pow(pow(vec_del_pos[0],2)+pow(vec_del_pos[1],2)+pow(vec_del_pos[2],2),0.5));
+  vel2 = std::inner_product(vec_outdrone_vel.begin(), vec_outdrone_vel.end(), vec_del_pos.begin(), 0.0)/(pow(pow(vec_del_pos[0],2)+pow(vec_del_pos[1],2)+pow(vec_del_pos[2],2),0.5));
+  
+  if(vel1-vel2<0)
+  return(0);
+
+  return vel1-vel2;
 }
 
 
@@ -528,10 +547,17 @@ int main(int argc, char** argv) {
           outdrone_vz=z_vel4;
         }
         else;
-
-
-      // Condition for middle region ------------------------------------------------------------------------------
-
+        std::vector<float> vec_outdrone_pos {outdrone_x,outdrone_y,outdrone_z};
+        std::vector<float> vec_outdrone_vel {outdrone_vx,outdrone_vy,outdrone_vz};
+        std::vector<float> vec_pos1 {x_pos1,y_pos1,z_pos1};
+        std::vector<float> vec_pos2 {x_pos2,y_pos2,z_pos2};
+        std::vector<float> vec_pos3 {x_pos3,y_pos3,z_pos3};
+        std::vector<float> vec_pos4 {x_pos4,y_pos4,z_pos4};
+        std::vector<float> vec_vel1 {x_vel1,y_vel1,z_vel1};
+        std::vector<float> vec_vel2 {x_vel2,y_vel2,z_vel2};
+        std::vector<float> vec_vel3 {x_vel3,y_vel3,z_vel3};
+        std::vector<float> vec_vel4 {x_vel4,y_vel4,z_vel4};
+      // Condition for middle region -----------------------------------------------------------------------------
       // if (r12>min_dist+arm_length || r13>min_dist+arm_length || r14>min_dist+arm_length)
       if (d[max_index]>radius*2*1.732 + 0.7)
       {
@@ -542,15 +568,15 @@ int main(int argc, char** argv) {
         // tar_y1 = y_pos1 + repel_const*(del_ry1/pow(mod_r1,exp_r));
         // tar_x1 = x_pos1 - 100*mod_v1*(del_vy1);
         // tar_y1 = y_pos1 - 100*mod_v1*(del_vx1);
-        // tar_z1 = z_pos1 + repel_const*(del_rz1/pow(mod_r1,exp_r));
-        // float del_vel1= pow((pow((x_vel1-outdrone_vx),2)+ pow((y_vel1-outdrone_vy),2) + pow((z_vel1-outdrone_vz),2)),0.5);
-        float app_v1 = (x_vel1*outdrone_vx + y_vel1*outdrone_vy + z_vel1*outdrone_vz)/(pow((pow(x_vel1,2)+ pow(y_vel1,2) + pow(z_vel1,2)),0.5));
+        // tar_z1 = z_pos1 + repel_const*(del_rz1/pow(mod_r1,exp_r));        
+        
+        float app_v1= app_vel(vec_pos1,vec_outdrone_pos,vec_vel1,vec_outdrone_vel);
         float del_r1 = pow((pow((x_pos1-outdrone_x),2)+ pow((y_pos1-outdrone_y),2) + pow((z_pos1-outdrone_z),2)),0.5);
         ROS_INFO("del_r1 from imposter = %f",del_r1);
         if (del_r1<1) del_r1 = 1;
-        if (app_v1<0) app_v1 = 0;
 
         tar_z1 = z_pos1 + vel_repel_const*app_v1/del_r1;
+        ROS_INFO("tar_z for 1 = %f",tar_z1);
         pose1.pose.position.x=x_pos1;
         pose1.pose.position.y=y_pos1;
         pose1.pose.position.z=tar_z1;
@@ -561,12 +587,10 @@ int main(int argc, char** argv) {
         // tar_x2 = x_pos2 - 100*mod_v2*(del_vy2);
         // tar_y2 = y_pos2 - 100*mod_v2*(del_vx2);
         // tar_z2 = z_pos2 + repel_const*(del_rz2/pow(mod_r2,exp_r));
-        // float del_vel2= pow((pow((x_vel2-outdrone_vx),2)+ pow((y_vel2-outdrone_vy),2) + pow((z_vel3-outdrone_vz),2)),0.5);
-        float app_v2 = (x_vel2*outdrone_vx + y_vel2*outdrone_vy + z_vel2*outdrone_vz)/(pow((pow(x_vel2,2)+ pow(y_vel2,2) + pow(z_vel2,2)),0.5));
+        float app_v2= app_vel(vec_pos2,vec_outdrone_pos,vec_vel2,vec_outdrone_vel);
         float del_r2 = pow((pow((x_pos2-outdrone_x),2)+ pow((y_pos2-outdrone_y),2) + pow((z_pos2-outdrone_z),2)),0.5);
 
         if (del_r2<1) del_r2 = 1;
-        if (app_v2<0) app_v2 = 0;
 
         tar_z2 = z_pos2 + vel_repel_const*app_v2/del_r2; 
         pose2.pose.position.x=x_pos2;
@@ -579,12 +603,10 @@ int main(int argc, char** argv) {
         // tar_x3 = x_pos3 - 100*mod_v3*(del_vy3);
         // tar_y3 = y_pos3 - 100*mod_v3*(del_vx3);
         // tar_z3 = z_pos3 + repel_const*(del_rz3/pow(mod_r3,exp_r));
-        // float del_vel3= pow((pow((x_vel3-outdrone_vx),2)+ pow((y_vel3-outdrone_vy),2) + pow((z_vel3-outdrone_vz),2)),0.5);
-        float app_v3 = (x_vel3*outdrone_vx + y_vel3*outdrone_vy + z_vel3*outdrone_vz)/(pow((pow(x_vel3,2)+ pow(y_vel3,2) + pow(z_vel3,2)),0.5));
+        float app_v3= app_vel(vec_pos3,vec_outdrone_pos,vec_vel3,vec_outdrone_vel);
         float del_r3 = pow((pow((x_pos3-outdrone_x),2)+ pow((y_pos3-outdrone_y),2) + pow((z_pos3-outdrone_z),2)),0.5);
 
         if (del_r3<1) del_r3 = 1;
-        if (app_v3<0) app_v3 = 0;
 
         tar_z3 = z_pos3 + vel_repel_const*app_v3/del_r3;   
         pose3.pose.position.x=x_pos3;
@@ -597,12 +619,10 @@ int main(int argc, char** argv) {
         // tar_x4 = x_pos4 - 100*mod_v4*(del_vy4);
         // tar_y4 = y_pos4 - 100*mod_v4*(del_vx4);
         // tar_z4 = z_pos4 + repel_const*(del_rz4/pow(mod_r4,exp_r));
-        // float del_vel4= pow((pow((x_vel4-outdrone_vx),2)+ pow((y_vel4-outdrone_vy),2) + pow((z_vel4-outdrone_vz),2)),0.5);
-        float app_v4 = (x_vel4*outdrone_vx + y_vel4*outdrone_vy + z_vel4*outdrone_vz)/(pow((pow(x_vel4,2)+ pow(y_vel4,2) + pow(z_vel4,2)),0.5));
+        float app_v4= app_vel(vec_pos4,vec_outdrone_pos,vec_vel4,vec_outdrone_vel);
         float del_r4 = pow((pow((x_pos4-outdrone_x),2)+ pow((y_pos4-outdrone_y),2) + pow((z_pos4-outdrone_z),2)),0.5);
 
         if (del_r4<1) del_r4 = 1;
-        if (app_v4<0) app_v4 = 0;
 
         tar_z4 = z_pos4 + vel_repel_const*app_v4/del_r4;
         
