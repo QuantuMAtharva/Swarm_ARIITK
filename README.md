@@ -6,6 +6,7 @@
 
 <p align="center">
     <img src="https://media.discordapp.net/attachments/892774933107707904/892775008294826054/general_repulsion.gif" />
+    <br>
     <i>When one of the drones is displaced a bit, it comes back to its original position in the formation while avoiding other drones that come along its way</i>
 </p>
 
@@ -17,6 +18,7 @@
 
 <p align="center">
     <img src="https://media.discordapp.net/attachments/892774933107707904/892775015731314778/vertical_repulsion.gif" />
+    <br>
     <i>The drones in formation rise up when another fast moving drone approaches them, to avoid a collision, and finally come back to their proper positions</i>
 </p>
 
