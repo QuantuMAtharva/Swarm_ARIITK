@@ -93,11 +93,12 @@ int main(int argc, char** argv){
 
   geometry_msgs::PoseStamped trajectory_msg1,trajectory_msg2,trajectory_msg3,trajectory_msg4;
 
-  while(ros::ok())
+  int i=0;
+  while(ros::ok() && i!=4)
   {
     ros::spinOnce();
     //ROS_INFO("position of firefly 1= %f %f %f",x_pos1,y_pos1,z_pos1);
-    for (int i=0;i<4;i++)
+    for (i=0;i<4;i++)
     {
       for (int j=1;j<5;j++)
       {
