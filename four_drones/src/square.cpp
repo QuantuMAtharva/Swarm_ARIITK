@@ -94,7 +94,8 @@ int main(int argc, char** argv){
   geometry_msgs::PoseStamped trajectory_msg1,trajectory_msg2,trajectory_msg3,trajectory_msg4;
 
   int i=0;
-  while(ros::ok() && i!=4)
+
+  while(ros::ok() && i!=4) // When i!=4 is added, the moving drone leaves the square path at a moment and joins the formation
   {
     ros::spinOnce();
     //ROS_INFO("position of firefly 1= %f %f %f",x_pos1,y_pos1,z_pos1);
