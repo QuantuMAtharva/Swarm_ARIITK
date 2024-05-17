@@ -2,10 +2,8 @@
 
 > ## Intra (General) Repulsion among drones when they are close to each other (when the formation is disturbed):
 
-<!-- ![General Repulsion](https://media.discordapp.net/attachments/892774933107707904/892775008294826054/general_repulsion.gif) -->
-
 <p align="center">
-    <img src="https://media.discordapp.net/attachments/892774933107707904/892775008294826054/general_repulsion.gif" />
+    <img src="https://raw.githubusercontent.com/QuantuMAtharva/Swarm_ARIITK/main/four_drones/resources/general_repulsion.gif" />
     <br>
     <i>When one of the drones is displaced a bit, it comes back to its original position in the formation while avoiding other drones that come along its way</i>
 </p>
@@ -14,10 +12,8 @@
 
 > ## Vertical Repulsion of drone formation to avoid collision when one fast-moving external drone approaches them:
 
-<!-- ![Vertical Repulsion](https://media.discordapp.net/attachments/892774933107707904/892775015731314778/vertical_repulsion.gif) -->
-
 <p align="center">
-    <img src="https://media.discordapp.net/attachments/892774933107707904/892775015731314778/vertical_repulsion.gif" />
+    <img src="https://raw.githubusercontent.com/QuantuMAtharva/Swarm_ARIITK/main/four_drones/resources/vertical_repulsion.gif" />
     <br>
     <i>The drones in formation rise up when another fast-moving drone approaches them to avoid a collision and finally come back to their proper positions</i>
 </p>
